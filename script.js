@@ -23,10 +23,6 @@ document.getElementById("gameBtn").addEventListener("click", function () {
 document.getElementById("songBtn").addEventListener("click", function () {
     alert("Song Clicked");
 });
-//Terminal 
-document.getElementById("terminalBtn").addEventListener("click", function () {
-    alert("Terminal Clicked");
-});
 //Resume
 document.getElementById("resumeBtn").addEventListener("click", function () {
     //alert("Resume Clicked");

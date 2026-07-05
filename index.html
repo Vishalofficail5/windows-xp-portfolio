@@ -70,7 +70,7 @@
 
                     <!-- LEFT SIDE -->
                     <div class="profile-section">
-                        <img src="assets/icons/about_me.png" alt="Profile" class="profile-image">
+                        <img src="assets/icons/me.png" alt="Profile" class="profile-image">
                     </div>
 
                     <!-- RIGHT SIDE -->
@@ -385,6 +385,46 @@
         </div>
     </div>
 
+    <!-- TERMINAL WINDOW -->
+    <div class="window" id="terminalWindow" data-window="terminal">
+
+        <div class="title-bar">
+            <div class="title-left">
+                <img src="assets/icons/Terminal.png" alt="Terminal">
+                <span class="window-title">MS-DOS Prompt</span>
+            </div>
+            <div class="title-buttons">
+                <div class="title-btn">
+                    <button class="minimizeBtn"><img src="assets/icons/mini.PNG" alt="Minimize"></button>
+                    <span class="btn-tooltip">Minimize</span>
+                </div>
+                <div class="title-btn">
+                    <button class="maximizeBtn"><img src="assets/icons/max.PNG" alt="Maximize"></button>
+                    <span class="btn-tooltip">Maximize</span>
+                </div>
+                <div class="title-btn">
+                    <button class="closeBtn"><img src="assets/icons/Close.PNG" alt="Close"></button>
+                    <span class="btn-tooltip">Close</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="window-body terminal-window-body">
+            <div class="terminal-screen" id="terminalScreen">
+                <div class="terminal-output" id="terminalOutput"></div>
+                <div class="terminal-input-line">
+                    <span class="terminal-prompt" id="terminalPrompt">C:\VISHAL&gt;</span>
+                    <input type="text" id="terminalInput" class="terminal-input" autocomplete="off" spellcheck="false">
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <span><b>Ready</b></span>
+            <span><b>Terminal.exe</b></span>
+        </div>
+    </div>
+
     <!--experience-->
     <div class="experience">
         <button id="experienceBtn">
@@ -491,6 +531,7 @@
 <script src="desktop.js"></script>
 <script src="script.js"></script>
 <script src="Tooltip.js"></script>
+<script src="terminal.js"></script>
 <script src="clock.js"></script>
 
 </html>

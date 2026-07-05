@@ -70,6 +70,9 @@ function openWindow(windowElement) {
         windowElement.classList.remove("window-opening");
     }, { once: true });
 
+    if (windowElement.id === "terminalWindow" && typeof window.focusTerminal === "function") {
+        window.focusTerminal();
+    }
 }
 
 // SETUP EVERY WINDOW
@@ -169,7 +172,6 @@ windows.forEach(windowElement => {
 // STATIC ENTRIES: apps that don't open a .window (just trigger their existing click behavior)
 const extraApps = [
     { id: "gameBtn", icon: "assets/icons/game.png", name: "Game" },
-    { id: "terminalBtn", icon: "assets/icons/Terminal.png", name: "Terminal" },
     { id: "songBtn", icon: "assets/icons/Song.png", name: "Lofty" },
 ];
 
@@ -204,5 +206,5 @@ document.getElementById("restartBtn").addEventListener("click", () => {
 
 // SHUT DOWN
 document.getElementById("shutdownBtn").addEventListener("click", () => {
-    document.body.innerHTML = `<div class="shutdown-screen">It's now safe to turn off your computer.</div>`;
+    document.body.innerHTML = `<div class="shutdown-screen">It's not safe to turn off your computer.</div>`;
 });

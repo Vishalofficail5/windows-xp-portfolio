@@ -28,6 +28,11 @@ const contactBtn = document.getElementById("contactBtn");
 const contactWindow = document.getElementById("contactWindow");
 contactBtn.addEventListener("dblclick", () => openWindow(contactWindow));
 
+// Terminal
+const terminalBtn = document.getElementById("terminalBtn");
+const terminalWindow = document.getElementById("terminalWindow");
+terminalBtn.addEventListener("dblclick", () => openWindow(terminalWindow));
+
 // Resume
 const resumeBtn = document.getElementById("resumeBtn");
 const resumeWindow = document.getElementById("resumeWindow");

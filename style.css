@@ -890,6 +890,94 @@ body {
     height: 32px;
 }
 
+/* TERMINAL WINDOW */
+.terminal-window-body {
+    padding: 0;
+    background: #000000;
+}
+
+.terminal-screen {
+    width: 100%;
+    height: 100%;
+    background: #000000;
+    color: #c0c0c0;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 14px;
+    line-height: 1.4;
+    padding: 8px;
+    overflow-y: auto;
+    box-sizing: border-box;
+    cursor: text;
+}
+
+.terminal-output {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.terminal-output .term-line {
+    min-height: 1.4em;
+}
+
+.terminal-output .term-echo {
+    color: #ffffff;
+}
+
+.terminal-output .term-error {
+    color: #ff5555;
+}
+
+.terminal-output .term-ok {
+    color: #55ff55;
+}
+
+.terminal-output .term-dim {
+    color: #808080;
+}
+
+.terminal-output a {
+    color: #55ffff;
+}
+
+.terminal-input-line {
+    display: flex;
+    align-items: center;
+}
+
+.terminal-prompt {
+    color: #c0c0c0;
+    margin-right: 6px;
+    white-space: nowrap;
+}
+
+.terminal-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #ffffff;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 14px;
+    caret-color: #ffffff;
+    padding: 0;
+    margin: 0;
+}
+
+.terminal-screen::-webkit-scrollbar {
+    width: 17px;
+}
+
+.terminal-screen::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.terminal-screen::-webkit-scrollbar-thumb {
+    background: #4d4d4d;
+    border-top: 2px solid #808080;
+    border-left: 2px solid #808080;
+    min-height: 35px;
+}
+
 /* RESUME WINDOW */
 .resume-container {
     display: flex;
