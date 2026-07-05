@@ -28,11 +28,6 @@ const contactBtn = document.getElementById("contactBtn");
 const contactWindow = document.getElementById("contactWindow");
 contactBtn.addEventListener("dblclick", () => openWindow(contactWindow));
 
-// Skills
-const skillBtn = document.getElementById("skillBtn");
-const skillWindow = document.getElementById("skillWindow");
-skillBtn.addEventListener("dblclick", () => openWindow(skillWindow));
-
 // Resume
 const resumeBtn = document.getElementById("resumeBtn");
 const resumeWindow = document.getElementById("resumeWindow");

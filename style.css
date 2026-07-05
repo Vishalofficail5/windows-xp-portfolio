@@ -483,50 +483,6 @@ body {
     background: rgba(173, 16, 16, 0.2);
 }
 
-/* Skill */
-.skill {
-    position: absolute;
-    top: 482px;
-    left: 11px;
-    width: 65px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    user-select: none;
-}
-
-.skill img {
-    width: 50px;
-    height: 50px;
-    object-fit: contain;
-}
-
-.skill button {
-    background: transparent;
-    border: none;
-    padding: 0;
-    margin: 0;
-    cursor: pointer;
-    width: fit-content;
-    height: fit-content;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.skill span {
-    margin-top: 1px;
-    color: rgb(0, 0, 0);
-    font-size: 15px;
-    text-align: center;
-    font-family: Tahoma, sans-serif;
-}
-
-.skill button:hover {
-    background: rgba(173, 16, 16, 0.2);
-}
-
 /* Game */
 .game {
     position: absolute;
@@ -665,8 +621,8 @@ body {
 /*resume*/
 .resume {
     position: absolute;
-    top: 202px;
-    left: 111px;
+    top: 486px;
+    left: 11px;
     width: 65px;
     display: flex;
     flex-direction: column;
@@ -676,8 +632,8 @@ body {
 }
 
 .resume img {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     object-fit: contain;
 }
 
@@ -709,7 +665,7 @@ body {
 /*mail*/
 .mail {
     position: absolute;
-    top: 290px;
+    top: 205px;
     left: 111px;
     width: 65px;
     display: flex;
@@ -720,8 +676,8 @@ body {
 }
 
 .mail img {
-    width: 53px;
-    height: 53px;
+    width: 51px;
+    height: 51px;
     object-fit: contain;
 }
 
@@ -739,7 +695,7 @@ body {
 }
 
 .mail span {
-    margin-top: -6px;
+    margin-top: -5px;
     color: rgb(0, 0, 0);
     font-size: 15px;
     text-align: center;
@@ -753,7 +709,7 @@ body {
 /*github*/
 .github {
     position: absolute;
-    top: 380px;
+    top: 290px;
     left: 111px;
     width: 65px;
     display: flex;
@@ -764,8 +720,8 @@ body {
 }
 
 .github img {
-    width: 53px;
-    height: 53px;
+    width: 51px;
+    height: 51px;
     object-fit: contain;
 }
 
@@ -797,7 +753,7 @@ body {
 /*linkedIn*/
 .linkedIn {
     position: absolute;
-    top: 482px;
+    top: 385px;
     left: 111px;
     width: 65px;
     display: flex;
@@ -808,8 +764,8 @@ body {
 }
 
 .linkedIn img {
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
     object-fit: contain;
 }
 
@@ -932,53 +888,6 @@ body {
 .contact-row img {
     width: 32px;
     height: 32px;
-}
-
-/* SKILL WINDOW */
-.skill-container h1 {
-    font-size: 34px;
-    margin-bottom: 10px;
-    color: #000080;
-}
-
-.skill-container hr {
-    margin-bottom: 20px;
-}
-
-.skill-row {
-    margin-bottom: 20px;
-}
-
-.skill-row .skill-name {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 6px;
-}
-
-.skill-row .skill-name img {
-    width: 30px;
-    height: 30px;
-    object-fit: contain;
-}
-
-.skill-meter {
-    display: flex;
-    border: 2px solid black;
-    width: 300px;
-    height: 22px;
-    background: white;
-}
-
-.skill-block {
-    flex: 1;
-    background: white;
-}
-
-.skill-block.filled {
-    background: black;
 }
 
 /* RESUME WINDOW */
@@ -1150,23 +1059,4 @@ body {
     justify-content: center;
     font-family: Tahoma, sans-serif;
     font-size: 20px;
-}
-
-.skill-row {
-    margin-bottom: 20px;
-}
-
-.progress-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.skill-percent {
-    font-weight: bold;
-    min-width: 40px;
-}
-
-.skill-meter {
-    display: flex;
 }

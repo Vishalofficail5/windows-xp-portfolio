@@ -15,10 +15,6 @@ document.getElementById("experienceBtn").addEventListener("click", function () {
 document.getElementById("contactBtn").addEventListener("click", function () {
     //alert("Contact Clicked");
 });
-// Skills
-document.getElementById("skillBtn").addEventListener("click", function () {
-    //alert("Skills Clicked");
-});
 // Game
 document.getElementById("gameBtn").addEventListener("click", function () {
     alert("Game Clicked");
