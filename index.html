@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows 95-portfolio</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="window.css">
+</head>
+
+<body>
+
+    <div class="desktop-icon">
+        <button id="homeBtn">
+            <img src="assets/icons/desktop icon.png" alt="Home">
+            <span><b>Home</b></span>
+        </button>
+    </div>
+
+    <!--About me-->
+    <div class="About-me">
+        <button id="aboutBtn">
+            <img src="assets/icons/about_me.png" alt="About-me">
+            <span><b>About me</b></span>
+        </button>
+    </div>
+
+    <!-- ABOUT ME WINDOW -->
+
+    <div class="window" id="aboutWindow" data-window="about">
+
+        <!-- TITLE BAR -->
+
+        <div class="title-bar">
+            <div class="title-left">
+                <img src="assets/icons/about_me.png" alt="About">
+                <span>About Me</span>
+            </div>
+            <div class="title-buttons">
+
+                <div class="title-btn">
+                    <button class="minimizeBtn">
+                        <img src="assets/icons/mini.PNG" alt="Minimize">
+                    </button>
+                    <span class="btn-tooltip">Minimize</span>
+                </div>
+
+                <div class="title-btn">
+                    <button class="maximizeBtn">
+                        <img src="assets/icons/max.PNG" alt="Maximize">
+                    </button>
+                    <span class="btn-tooltip">Maximize</span>
+                </div>
+
+                <div class="title-btn">
+                    <button class="closeBtn">
+                        <img src="assets/icons/Close.PNG" alt="Close">
+                    </button>
+                    <span class="btn-tooltip">Close</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- WINDOW BODY -->
+
+        <div class="window-body">
+            <div class="window-content">
+                <div class="about-container">
+
+                    <!-- LEFT SIDE -->
+                    <div class="profile-section">
+                        <img src="assets/icons/about_me.png" alt="Profile" class="profile-image">
+                    </div>
+
+                    <!-- RIGHT SIDE -->
+
+                    <div class="about-section">
+                        <h1>Hello, I'm Vishal</h1>
+                        <h3>Backend Developer</h3>
+                        <hr>
+                        <p>
+                            I am a Backend Developer passionate about
+                            creating fast, scalable and modern web
+                            applications.
+                        </p>
+                        <p>
+                            Currently learning Data Structures &
+                            Algorithms, Java, Spring Boot and
+                            Full Stack Development.
+                        </p>
+                        <p>
+                            I enjoy building projects that combine
+                            beautiful design with powerful backend
+                            architecture.
+                        </p>
+                        <h3>Quick Information</h3>
+                        <ul>
+                            <li>📍 India</li>
+                            <li>💻 Backend Developer</li>
+                            <li>☕ Java & Spring Boot</li>
+                            <li>🚀 Open Source Learner</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATUS BAR -->
+
+        <div class="status-bar">
+            <span><b>Ready</b></span>
+            <span><b>Portfolio.exe</b></span>
+        </div>
+    </div>
+
+    <!--Project-->
+    <div class="Project">
+        <button id="projectBtn">
+            <img src="assets/icons/Projectt.png" alt="Project">
+            <span><b>Project</b></span>
+        </button>
+
+    </div>
+
+    <div class="window" id="projectsWindow" data-window="projects">
+
+        <!-- TITLE BAR -->
+        <div class="title-bar">
+            <div class="title-left">
+                <img src="assets/icons/Projectt.png" alt="Projects">
+                <span class="window-title">Projects</span>
+            </div>
+
+            <div class="title-buttons">
+
+                <div class="title-btn">
+                    <button class="minimizeBtn">
+                        <img src="assets/icons/mini.PNG" alt="Minimize">
+                    </button>
+                    <span class="btn-tooltip">Minimize</span>
+                </div>
+
+                <div class="title-btn">
+                    <button class="maximizeBtn">
+                        <img src="assets/icons/max.PNG" alt="Maximize">
+                    </button>
+                    <span class="btn-tooltip">Maximize</span>
+                </div>
+
+                <div class="title-btn">
+                    <button class="closeBtn">
+                        <img src="assets/icons/Close.PNG" alt="Close">
+                    </button>
+                    <span class="btn-tooltip">Close</span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- WINDOW BODY -->
+        <div class="window-body">
+            <div class="window-content">
+                <div class="projects-container">
+                    <h1>My Projects</h1>
+                    <hr>
+                    <div class="project-card">
+                        <img src="assets/icons/Projectt.png" alt="Project">
+                        <div class="project-info">
+                            <h2>Windows 95 Portfolio</h2>
+                            <p>Retro desktop portfolio inspired by Windows 95.</p>
+                            <span>HTML • CSS • JavaScript</span>
+                            <div class="project-buttons">
+                                <button>Open</button>
+                                <button>GitHub</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-card">
+                        <img src="assets/icons/Projectt.png" alt="Project">
+                        <div class="project-info">
+                            <h2>Library Management System</h2>
+                            <p>
+                                Java desktop application for managing books.
+                            </p>
+                            <span>Java • MySQL</span>
+                            <div class="project-buttons">
+                                <button>Open</button>
+                                <button>GitHub</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <img src="assets/icons/Projectt.png" alt="Project">
+                        <div class="project-info">
+                            <h2>Weather App</h2>
+                            <p>
+                                Weather application using public API.
+                            </p>
+                            <span>JavaScript • API</span>
+                            <div class="project-buttons">
+                                <button>Open</button>
+                                <button>GitHub</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+
+        <!-- STATUS BAR -->
+        <div class="status-bar">
+            <span><b>Ready</b></span>
+            <span><b>Projects.exe</b></span>
+        </div>
+
+    </div>
+
+    <!-- EXPERIENCE WINDOW -->
+    <div class="window" id="experienceWindow" data-window="experience">
+
+        <div class="title-bar">
+            <div class="title-left">
+                <img src="assets/icons/Experience.png" alt="Experience">
+                <span class="window-title">Experience</span>
+            </div>
+            <div class="title-buttons">
+                <div class="title-btn">
+                    <button class="minimizeBtn"><img src="assets/icons/mini.PNG" alt="Minimize"></button>
+                    <span class="btn-tooltip">Minimize</span>
+                </div>
+                <div class="title-btn">
+                    <button class="maximizeBtn"><img src="assets/icons/max.PNG" alt="Maximize"></button>
+                    <span class="btn-tooltip">Maximize</span>
+                </div>
+                <div class="title-btn">
+                    <button class="closeBtn"><img src="assets/icons/Close.PNG" alt="Close"></button>
+                    <span class="btn-tooltip">Close</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="window-body">
+            <div class="window-content">
+                <div class="experience-container">
+                    <h1>Experience</h1>
+                    <hr>
+
+                    <div class="exp-card">
+                        <div class="exp-header">
+                            <h2>Design Consultant</h2>
+                            <span class="exp-date">WIKA Instruments Pvt. Ltd.</span>
+                        </div>
+                        <p>Worked on design consultation tasks during internship, applying mechanical engineering
+                            background to instrumentation product workflows.</p>
+                    </div>
+
+                    <div class="exp-card">
+                        <div class="exp-header">
+                            <h2>Intern</h2>
+                            <span class="exp-date">Railway Coach Care Center</span>
+                        </div>
+                        <p>Hands-on exposure to maintenance and inspection processes for railway coaches.</p>
+                    </div>
+
+                    <div class="exp-card">
+                        <div class="exp-header">
+                            <h2>Certifications</h2>
+                        </div>
+                        <ul>
+                            <li>NSIC — AutoCAD</li>
+                            <li>Google Cloud — Generative AI</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <span><b>Ready</b></span>
+            <span><b>Experience.exe</b></span>
+        </div>
+    </div>
+
+    <!-- CONTACT WINDOW -->
+    <div class="window" id="contactWindow" data-window="contact">
+
+        <div class="title-bar">
+            <div class="title-left">
+                <img src="assets/icons/Contact_me.png" alt="Contact">
+                <span class="window-title">Contact Me</span>
+            </div>
+            <div class="title-buttons">
+                <div class="title-btn">
+                    <button class="minimizeBtn"><img src="assets/icons/mini.PNG" alt="Minimize"></button>
+                    <span class="btn-tooltip">Minimize</span>
+                </div>
+                <div class="title-btn">
+                    <button class="maximizeBtn"><img src="assets/icons/max.PNG" alt="Maximize"></button>
+                    <span class="btn-tooltip">Maximize</span>
+                </div>
+                <div class="title-btn">
+                    <button class="closeBtn"><img src="assets/icons/Close.PNG" alt="Close"></button>
+                    <span class="btn-tooltip">Close</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="window-body">
+            <div class="window-content">
+                <div class="contact-container">
+                    <h1>Contact Me</h1>
+                    <hr>
+
+                    <div class="contact-links">
+                        <a href="mailto:vishal05.official@gmail.com" class="contact-row">
+                            <img src="assets/icons/mail.png" alt="Email">
+                            <span>vishal@example.com</span>
+                        </a>
+                        <a href="https://github.com/Vishalofficail5" target="_blank" rel="noopener" class="contact-row">
+                            <img src="assets/icons/Github.png" alt="GitHub">
+                            <span>github.com/Vishalofficail5</span>
+                        </a>
+                        <a href="https://linkedin.com/in/vishal05official" target="_blank" rel="noopener"
+                            class="contact-row">
+                            <img src="assets/icons/LinkedIn.png" alt="LinkedIn">
+                            <span>linkedin.com/in/vishal05official</span>
+                        </a>
+                        <div class="contact-row contact-row-static">
+                            <img src="assets/icons/locations.png" alt="Location">
+                            <span>New Delhi, India</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <span><b>Ready</b></span>
+            <span><b>Contact.exe</b></span>
+        </div>
+    </div>
+
+    <!-- SKILL WINDOW -->
+    <div class="window" id="skillWindow" data-window="skill">
+
+        <div class="title-bar">
+            <div class="title-left">
+                <img src="assets/icons/skills.png" alt="Skills">
+                <span class="window-title">Skills</span>
+            </div>
+            <div class="title-buttons">
+                <div class="title-btn">
+                    <button class="minimizeBtn"><img src="assets/icons/mini.PNG" alt="Minimize"></button>
+                    <span class="btn-tooltip">Minimize</span>
+                </div>
+                <div class="title-btn">
+                    <button class="maximizeBtn"><img src="assets/icons/max.PNG" alt="Maximize"></button>
+                    <span class="btn-tooltip">Maximize</span>
+                </div>
+                <div class="title-btn">
+                    <button class="closeBtn"><img src="assets/icons/Close.PNG" alt="Close"></button>
+                    <span class="btn-tooltip">Close</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="window-body">
+            <div class="window-content">
+                <div class="skill-container">
+                    <h1>Skills</h1>
+                    <hr>
+                    <div class="skill-list" id="skillList"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <span><b>Ready</b></span>
+            <span><b>Skills.exe</b></span>
+        </div>
+    </div>
+
+    <!-- RESUME WINDOW -->
+    <div class="window" id="resumeWindow" data-window="resume">
+
+        <div class="title-bar">
+            <div class="title-left">
+                <img src="assets/icons/Resume.png" alt="Resume">
+                <span class="window-title">Resume</span>
+            </div>
+            <div class="title-buttons">
+                <div class="title-btn">
+                    <button class="minimizeBtn"><img src="assets/icons/mini.PNG" alt="Minimize"></button>
+                    <span class="btn-tooltip">Minimize</span>
+                </div>
+                <div class="title-btn">
+                    <button class="maximizeBtn"><img src="assets/icons/max.PNG" alt="Maximize"></button>
+                    <span class="btn-tooltip">Maximize</span>
+                </div>
+                <div class="title-btn">
+                    <button class="closeBtn"><img src="assets/icons/Close.PNG" alt="Close"></button>
+                    <span class="btn-tooltip">Close</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="window-body">
+            <div class="window-content">
+                <div class="resume-container">
+                    <div class="resume-preview">
+                        <img src="assets/icons/Resume.png" alt="Resume">
+                    </div>
+                    <div class="resume-actions">
+                        <button id="resumeViewBtn">View</button>
+                        <button id="resumeDownloadBtn">Download</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <span><b>Ready</b></span>
+            <span><b>Resume.exe</b></span>
+        </div>
+    </div>
+
+    <!--experience-->
+    <div class="experience">
+        <button id="experienceBtn">
+            <img src="assets/icons/Experience.png" alt="experience">
+            <span><b>Experience</b></span>
+        </button>
+    </div>
+
+
+    <!--Contact-me-->
+    <div class="Contact-me">
+        <button id="contactBtn">
+            <img src="assets/icons/Contact_me.png" alt="Contact-me">
+            <span><b>Contact me</b></span>
+        </button>
+    </div>
+
+    <!--skill-->
+    <div class="skill">
+        <button id="skillBtn">
+            <img src="assets/icons/skills.png" alt="skill">
+            <span><b>Skills</b></span>
+        </button>
+    </div>
+
+    <!--game-->
+    <div class="game">
+        <button id="gameBtn">
+            <img src="assets/icons/game.png" alt="game">
+            <span><b>Game</b></span>
+        </button>
+    </div>
+
+    <!--song-->
+    <div class="song">
+        <button id="songBtn">
+            <img src="assets/icons/Song.png" alt="song">
+            <span><b>Lotify</b></span>
+        </button>
+    </div>
+
+    <!--terminal-->
+    <div class="terminal">
+        <button id="terminalBtn">
+            <img src="assets/icons/Terminal.png" alt="terminal">
+            <span><b>Terminal</b></span>
+        </button>
+    </div>
+
+    <!--resume-->
+    <div class="resume">
+        <button id="resumeBtn">
+            <img src="assets/icons/Resume.png" alt="resume">
+            <span><b>Resume</b></span>
+        </button>
+    </div>
+
+    <!--mail-->
+    <div class="mail">
+        <button onclick="window.location.href='mailto:vishal05.official@gmail.com'">
+            <img src="assets/icons/mail.png" alt="mail">
+            <span><b>E-mail</b></span>
+        </button>
+    </div>
+
+
+    <!--github-->
+    <div class="github">
+        <button onclick="window.open('https://github.com/Vishalofficail5','_blank')">
+            <img src="assets/icons/Github.png" alt="github">
+            <span><b>Github</b></span>
+        </button>
+    </div>
+    <!--linkedIn-->
+    <div class="linkedIn">
+        <button onclick="window.open('https://linkedin.com/in/vishal05official','_blank')">
+            <img src="assets/icons/LinkedIn.png" alt="linkedIn">
+            <span><b>LinkedIn</b></span>
+        </button>
+    </div>
+
+    <div class="start-menu" id="startMenu">
+        <div class="start-menu-side">Windows95</div>
+        <div class="start-menu-main">
+            <div class="start-menu-apps" id="startMenuApps"></div>
+            <div class="start-menu-divider"></div>
+            <button id="restartBtn" class="start-menu-item">
+                <img src="assets/icons/restart.png" alt="">Restart
+            </button>
+            <button id="shutdownBtn" class="start-menu-item">
+                <img src="assets/icons/Shutdown-preview.png" alt="">Shut Down
+            </button>
+        </div>
+    </div>
+
+    <div class="taskbar">
+        <button class="start-btn">
+            <img src="assets/icons/Window start logo.png" alt="">
+            <span>Start</span>
+        </button>
+
+        <div class="running-apps"></div>
+
+        <div class="system-tray">
+            <span class="clock-day" id="clockDay">Sun</span>
+            <span class="clock" id="clockTime">11:11 PM</span>
+        </div>
+    </div>
+
+</body>
+<script src="window.js"></script>
+<script src="desktop.js"></script>
+<script src="script.js"></script>
+<script src="Tooltip.js"></script>
+<script src="skills.js"></script>
+<script src="clock.js"></script>
+
+</html>
