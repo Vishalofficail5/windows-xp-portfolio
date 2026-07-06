@@ -58,7 +58,9 @@ body {
 }
 
 .desktop-icon button:hover {
-    background: rgba(173, 16, 16, 0.2);
+    background: transparent;
+    outline: 1px dotted #020202;
+    outline-offset: 1px;
 }
 
 /* Taskbar */
@@ -141,6 +143,10 @@ body {
 
 .app-btn.active {
     background: #bcbcbc;
+    border-top: 2px solid #555;
+    border-left: 2px solid #555;
+    border-right: 2px solid white;
+    border-bottom: 2px solid white;
 }
 
 .system-tray {
@@ -148,6 +154,12 @@ body {
     align-items: center;
     padding: 0 10px;
     border-left: 2px solid gray;
+}
+
+.clock-date {
+    font-weight: bold;
+    padding-right: 8px;
+    border-right: 2px solid gray;
 }
 
 .clock-day {
@@ -201,7 +213,9 @@ body {
 }
 
 .About-me button:hover {
-    background: rgba(173, 16, 16, 0.2);
+    background: transparent;
+    outline: 1px dotted #000000;
+    outline-offset: 1px;
 }
 
 /* ABOUT ME WINDOW */
@@ -231,7 +245,7 @@ body {
 /* TEXT */
 .about-section {
     flex: 1;
-    font-family: Tahoma, sans-serif;
+    font-family: Tahoma;
     color: black;
 }
 
@@ -306,7 +320,9 @@ body {
 }
 
 .Project button:hover {
-    background: rgba(173, 16, 16, 0.2);
+    background: transparent;
+    outline: 1px dotted #000000;
+    outline-offset: 1px;
 }
 
 /*PROJECTS*/
@@ -384,7 +400,7 @@ body {
     border-left: 2px solid white;
     border-right: 2px solid gray;
     border-bottom: 2px solid gray;
-    font-family: Tahoma, sans-serif;
+    font-family: Tahoma;
     cursor: pointer;
 }
 
@@ -436,7 +452,9 @@ body {
 }
 
 .experience button:hover {
-    background: rgba(173, 16, 16, 0.2);
+    background: transparent;
+    outline: 1px dotted #000000;
+    outline-offset: 1px;
 }
 
 /* Contact me */
@@ -480,7 +498,9 @@ body {
 }
 
 .Contact-me button:hover {
-    background: rgba(173, 16, 16, 0.2);
+    background: transparent;
+    outline: 1px dotted #000000;
+    outline-offset: 1px;
 }
 
 /* Game */
@@ -524,7 +544,9 @@ body {
 }
 
 .game button:hover {
-    background: rgba(173, 16, 16, 0.2);
+    background: transparent;
+    outline: 1px dotted #000000;
+    outline-offset: 1px;
     width: 50px;
     height: -40px;
     padding-top: 0%;
@@ -571,7 +593,9 @@ body {
 }
 
 .song button:hover {
-    background: rgba(173, 16, 16, 0.2);
+    background: transparent;
+    outline: 1px dotted #000000;
+    outline-offset: 1px;
 }
 
 /* Terminal */
@@ -615,7 +639,9 @@ body {
 }
 
 .terminal button:hover {
-    background: rgba(173, 16, 16, 0.2);
+    background: transparent;
+    outline: 1px dotted #000000;
+    outline-offset: 1px;
 }
 
 /*resume*/
@@ -659,7 +685,9 @@ body {
 }
 
 .resume button:hover {
-    background: rgba(173, 16, 16, 0.2);
+    background: transparent;
+    outline: 1px dotted #000000;
+    outline-offset: 1px;
 }
 
 /*mail*/
@@ -703,7 +731,9 @@ body {
 }
 
 .mail button:hover {
-    background: rgba(173, 16, 16, 0.2);
+    background: transparent;
+    outline: 1px dotted #000000;
+    outline-offset: 1px;
 }
 
 /*github*/
@@ -747,7 +777,9 @@ body {
 }
 
 .github button:hover {
-    background: rgba(173, 16, 16, 0.2);
+    background: transparent;
+    outline: 1px dotted #000000;
+    outline-offset: 1px;
 }
 
 /*linkedIn*/
@@ -791,7 +823,9 @@ body {
 }
 
 .linkedIn button:hover {
-    background: rgba(173, 16, 16, 0.2);
+    background: transparent;
+    outline: 1px dotted #000000;
+    outline-offset: 1px;
 }
 
 /* EXPERIENCE WINDOW */
@@ -1147,18 +1181,4 @@ body {
     justify-content: center;
     font-family: Tahoma, sans-serif;
     font-size: 20px;
-}
-
-#repeatBtn img {
-    width: 20px;
-    height: 20px;
-    object-fit: scale-down;
-    pointer-events: none;
-}
-
-#shuffleBtn img {
-    width: 24px;
-    height: 24px;
-    object-fit: contain;
-    pointer-events: none;
 }

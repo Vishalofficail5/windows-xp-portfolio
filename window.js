@@ -6,9 +6,17 @@ let highestZ = 100;
 const runningApps = document.querySelector(".running-apps");
 const taskbarButtons = {};
 
+function setActiveTaskbarButton(windowElement) {
+    const id = windowElement.id;
+    Object.entries(taskbarButtons).forEach(([btnId, btn]) => {
+        btn.classList.toggle("active", btnId === id);
+    });
+}
+
 function bringToFront(windowElement) {
     highestZ++;
     windowElement.style.zIndex = highestZ;
+    setActiveTaskbarButton(windowElement);
 }
 
 function createTaskbarButton(windowElement) {
@@ -19,7 +27,7 @@ function createTaskbarButton(windowElement) {
     const title = windowElement.querySelector(".title-left span").textContent;
 
     const btn = document.createElement("button");
-    btn.className = "app-btn active";
+    btn.className = "app-btn";
     btn.innerHTML = `<img src="${icon}" alt=""><span>${title}</span>`;
 
     btn.addEventListener("click", () => {
@@ -42,6 +50,56 @@ function removeTaskbarButton(windowElement) {
         taskbarButtons[id].remove();
         delete taskbarButtons[id];
     }
+}
+
+function showLoadingOverlay(windowElement, onDone) {
+    const body = windowElement.querySelector(".window-body");
+    if (!body) {
+        if (onDone) onDone();
+        return;
+    }
+
+    const existing = body.querySelector(".window-loading-overlay");
+    if (existing) existing.remove();
+
+    const overlay = document.createElement("div");
+    overlay.className = "window-loading-overlay";
+    overlay.innerHTML = `
+        <div class="loading-row">
+            <span>Loading</span>
+            <span class="loading-percent">0%</span>
+        </div>
+        <div class="loading-bar-outer">
+            <div class="loading-bar-fill"></div>
+        </div>
+    `;
+    body.appendChild(overlay);
+
+    const percentEl = overlay.querySelector(".loading-percent");
+    const fillEl = overlay.querySelector(".loading-bar-fill");
+
+    const stages = [
+        { pct: 10, delay: 300 },
+        { pct: 50, delay: 700 },
+        { pct: 100, delay: 700 }
+    ];
+
+    let elapsed = 0;
+    stages.forEach(stage => {
+        elapsed += stage.delay;
+        setTimeout(() => {
+            percentEl.textContent = stage.pct + "%";
+            fillEl.style.width = stage.pct + "%";
+        }, elapsed);
+    });
+
+    setTimeout(() => {
+        overlay.classList.add("loading-fade-out");
+        overlay.addEventListener("animationend", () => {
+            overlay.remove();
+            if (onDone) onDone();
+        }, { once: true });
+    }, elapsed + 250);
 }
 
 function openWindow(windowElement) {
@@ -70,9 +128,11 @@ function openWindow(windowElement) {
         windowElement.classList.remove("window-opening");
     }, { once: true });
 
-    if (windowElement.id === "terminalWindow" && typeof window.focusTerminal === "function") {
-        window.focusTerminal();
-    }
+    showLoadingOverlay(windowElement, () => {
+        if (windowElement.id === "terminalWindow" && typeof window.focusTerminal === "function") {
+            window.focusTerminal();
+        }
+    });
 }
 
 // SETUP EVERY WINDOW
@@ -88,6 +148,7 @@ windows.forEach(windowElement => {
     windowElement.addEventListener("mousedown", () => {
         highestZ++;
         windowElement.style.zIndex = highestZ;
+        setActiveTaskbarButton(windowElement);
     });
 
     // CLOSE
