@@ -18,7 +18,7 @@
             "Intern — Railway Coach Care Center\n" +
             "Certifications: NSIC AutoCAD, Google Cloud Generative AI",
         "projects.txt":
-            "Windows 95 Portfolio — HTML / CSS / JavaScript\n" +
+            "V-OS Portfolio — HTML / CSS / JavaScript\n" +
             "Library Management System — Java / MySQL\n" +
             "Weather App — JavaScript / public API\n" +
             "Roadscapes-VLM-Comparison — benchmarking Phi-3, Qwen2-VL, LLaVA, PaliGemma\n" +

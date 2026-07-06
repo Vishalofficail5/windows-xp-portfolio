@@ -77,7 +77,7 @@
     margin-top: 10px;
 }
 
-/* ---- Stages 2 & 4: plain black "Starting Windows 95..." ---- */
+/* ---- Stages 2 & 4: plain black "Starting V-OS..." ---- */
 
 .boot-stage-plain {
     background: #000;
@@ -112,7 +112,7 @@
     }
 }
 
-/* ---- Stage 3: Windows 95 logo ---- */
+/* ---- Stage 3: V-OS logo ---- */
 
 .boot-stage-logo {
     align-items: center;
