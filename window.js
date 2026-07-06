@@ -52,56 +52,6 @@ function removeTaskbarButton(windowElement) {
     }
 }
 
-function showLoadingOverlay(windowElement, onDone) {
-    const body = windowElement.querySelector(".window-body");
-    if (!body) {
-        if (onDone) onDone();
-        return;
-    }
-
-    const existing = body.querySelector(".window-loading-overlay");
-    if (existing) existing.remove();
-
-    const overlay = document.createElement("div");
-    overlay.className = "window-loading-overlay";
-    overlay.innerHTML = `
-        <div class="loading-row">
-            <span>Loading</span>
-            <span class="loading-percent">0%</span>
-        </div>
-        <div class="loading-bar-outer">
-            <div class="loading-bar-fill"></div>
-        </div>
-    `;
-    body.appendChild(overlay);
-
-    const percentEl = overlay.querySelector(".loading-percent");
-    const fillEl = overlay.querySelector(".loading-bar-fill");
-
-    const stages = [
-        { pct: 10, delay: 300 },
-        { pct: 50, delay: 700 },
-        { pct: 100, delay: 700 }
-    ];
-
-    let elapsed = 0;
-    stages.forEach(stage => {
-        elapsed += stage.delay;
-        setTimeout(() => {
-            percentEl.textContent = stage.pct + "%";
-            fillEl.style.width = stage.pct + "%";
-        }, elapsed);
-    });
-
-    setTimeout(() => {
-        overlay.classList.add("loading-fade-out");
-        overlay.addEventListener("animationend", () => {
-            overlay.remove();
-            if (onDone) onDone();
-        }, { once: true });
-    }, elapsed + 250);
-}
-
 function openWindow(windowElement) {
 
     if (windowElement.style.display === "flex") {

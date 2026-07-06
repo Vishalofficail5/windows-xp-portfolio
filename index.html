@@ -4,14 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>V-OS-portfolio</title>
+    <title>V-OS-Portfolio</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="window.css">
     <link rel="stylesheet" href="Song.css">
     <link rel="stylesheet" href="arcade.css">
     <link rel="stylesheet" href="Boot.css">
 </head>
-
+<head>
+    <title>My Portfolio</title>
+    <link rel="icon" type="image/png" href="assets/icons/me.png">
+</head>
 <body>
 
     <!-- BOOT SCREEN — 4 stages, see Boot.js -->
@@ -22,6 +25,9 @@
             <div class="boot-bios-box">
                 <div>Phoenix BIOS v4.0</div>
                 <div>Memory Test...</div>
+                <!--<div>“DISClAIMER------⚠This project is a personal portfolio inspired by the classic user interface of Microsoft Windows
+                    98. This project is for educational and personal demonstration purposes only and is not affiliated
+                    with or endorsed by Microsoft.”</div>-->
                 <div class="boot-bios-bar-row">
                     <div class="boot-bios-bar-outer">
                         <div class="boot-bios-bar-fill" id="bootBiosBar"></div>
@@ -126,30 +132,71 @@
 
                     <div class="about-section">
                         <h1>Hello, I'm Vishal</h1>
-                        <h3>Backend Developer</h3>
+                        <h3>Third Year B.Tech AI & DS</h3>
                         <hr>
+                        <h3><b><u>*Skills*</u></b></h3>
+                        <div class="skills">
+                            <p> AI <span>•</span> Python <span>•</span> Web(HTML,CSS,JS) </p>
+                            <p> Java <span>•</span> C++ <span>•</span> C <span>•</span> Git & GitHub </p>
+                        </div>
+                        <hr>
+                        <h3><b><u>*Current Focus*</u></b></h3>
                         <p>
-                            I am a Backend Developer passionate about
-                            creating fast, scalable and modern web
-                            applications.
+                            <b>Learning:—</b>Machine Learning, Deep Learning, Computer Vision, LLMs.
                         </p>
                         <p>
-                            Currently learning Data Structures &
-                            Algorithms, Java, Spring Boot and
-                            Full Stack Development.
+                            <b>V-OS Portfolio:—</b> Building a Windows 98-inspired portfolio with custom desktop
+                            apps,games,
+                            animations, music player, startup/shutdown sequence, and modern JavaScript.
                         </p>
                         <p>
-                            I enjoy building projects that combine
-                            beautiful design with powerful backend
-                            architecture.
+                            <b>AI Research:—</b> Benchmarking Vision Language Models (Qwen2-VL, Phi-3, LLaVA,
+                            PaliGemma) on
+                            road-scene understanding, object counting, and image description tasks.
                         </p>
-                        <h3>Quick Information</h3>
-                        <ul>
-                            <li>📍 India</li>
-                            <li>💻 Backend Developer</li>
-                            <li>☕ Java & Spring Boot</li>
-                            <li>🚀 Open Source Learner</li>
-                        </ul>
+                        <p>
+                            <b>Exploring:—</b> Hugging Face Transformers, model fine-tuning, quantization (PTQ vs
+                            QLoRA), RAG, and AI agents.
+                        </p>
+                        <p>
+                            <b>Currently reading:—</b> Papers on multimodal AI, efficient LLM inference, and computer
+                            vision.
+                        </p>
+                        <p>
+                            <b>Backend:—</b> Exploring Node.js, Express.js, REST APIs, authentication (JWT), databases
+                            (MongoDB & PostgreSQL), and scalable backend architecture.
+                        </p>
+                        <p>
+                            <b>Goal:—</b> Becoming a Backend Developer who builds scalable web services and AI-powered
+                            applications with clean, efficient architecture.
+                        </p>
+                        <hr>
+                        <h3><b><u>*Education*</u></b></h3>
+                        <div class="school">
+                            <div class="top">
+                                <h4><u>B.Tech. Artificial Intelligence & Data Science</u></h4>
+                                <span>Present</span>
+                            </div>
+                            <p>Dr.Akhilesh Das Gupta Institute of Professional Studies(ADGIPS)</p>
+                            <p>Guru Gobind Singh Indraprastha University (GGSIPU)</p>
+                        </div>
+
+                        <div class="school">
+                            <div class="top">
+                                <h4><u>Diploma Mechanical Engineering</u></h4>
+                                <span>2020 — 2023</span>
+                            </div>
+                            <p>G.B. Pant Institute of Technology</p>
+                        </div>
+
+                        <div class="school">
+                            <div class="top">
+                                <h4><u>Class — X</u></h4>
+                                <span>2019 — 2020</span>
+                            </div>
+                            <p>Tinu Public School</p>
+                        </div>
+                        </section>
                     </div>
                 </div>
             </div>
@@ -217,11 +264,18 @@
                         <img src="assets/icons/Projectt.png" alt="Project">
                         <div class="project-info">
                             <h2>V-OS Portfolio</h2>
-                            <p>Retro desktop portfolio inspired by V-OS.</p>
+                            <p>A Windows-inspired portfolio featuring custom desktop apps, a music player, smooth
+                                animations, and modern JavaScript..</p>
                             <span>HTML • CSS • JavaScript</span>
                             <div class="project-buttons">
-                                <button>Open</button>
-                                <button>GitHub</button>
+                                <div class="project-buttons">
+                                    <a href="https://your-live-demo.com" target="_blank">
+                                        <button>Open</button>
+                                    </a>
+                                    <a href="https://github.com/Vishalofficail5/v-os-portfolio.git" target="_blank">
+                                        <button>GitHub</button>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -229,14 +283,43 @@
                     <div class="project-card">
                         <img src="assets/icons/Projectt.png" alt="Project">
                         <div class="project-info">
-                            <h2>Library Management System</h2>
+                            <h2>Roadscapes — VLM Comparison Under Day & Night Conditions</h2>
                             <p>
-                                Java desktop application for managing books.
+                                A benchmarking pipeline evaluating four vision-language models — Phi-3, Qwen2-VL, LLaVA,
+                                and PaliGemma — on road-scene QA tasks using the Roadscapes dataset. Models were scored
+                                across Object Counting, Object Description, and Surrounding Description, separately for
+                                day and night conditions, with automated comparison tables and charts generated for
+                                category-wise and overall accuracy.
                             </p>
-                            <span>Java • MySQL</span>
+                            <span>Python • Pandas • NumPy • Matplotlib • Hugging Face Transformers • Vision-Language
+                                Models</span>
+                            <div class="model-results">
+                                <div class="model-card winner">
+                                    <div class="score">49.33%</div>
+                                    <div class="model-name">Qwen2-VL</div>
+                                </div>
+
+                                <div class="model-card">
+                                    <div class="score">45.83%</div>
+                                    <div class="model-name">Phi-3</div>
+                                </div>
+
+                                <div class="model-card">
+                                    <div class="score">42.83%</div>
+                                    <div class="model-name">LLaVA</div>
+                                </div>
+
+                                <div class="model-card">
+                                    <div class="score">40.00%</div>
+                                    <div class="model-name">PaliGemma</div>
+                                </div>
+                            </div>
                             <div class="project-buttons">
                                 <button>Open</button>
-                                <button>GitHub</button>
+                                <a href="https://github.com/Vishalofficail5/Roadscapes-VLM-Comparison.git"
+                                    target="_blank">
+                                    <button>GitHub</button>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -245,9 +328,37 @@
                         <div class="project-info">
                             <h2>Weather App</h2>
                             <p>
-                                Weather application using public API.
+                                🚧 In Development.
                             </p>
                             <span>JavaScript • API</span>
+                            <div class="project-buttons">
+                                <button>Open</button>
+                                <button>GitHub</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <img src="assets/icons/Projectt.png" alt="Project">
+                        <div class="project-info">
+                            <h2>GitHub Practice Tracker</h2>
+                            <p>
+                                🚧 In Development.
+                            </p>
+                            <span>Unknow</span>
+                            <div class="project-buttons">
+                                <button>Open</button>
+                                <button>GitHub</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-card">
+                        <img src="assets/icons/Projectt.png" alt="Project">
+                        <div class="project-info">
+                            <h2>Codeforces Dashboard</h2>
+                            <p>
+                                🚧 In Development.
+                            </p>
+                            <span>Unknow</span>
                             <div class="project-buttons">
                                 <button>Open</button>
                                 <button>GitHub</button>
@@ -295,36 +406,68 @@
                     <h1>Experience</h1>
                     <hr>
 
-                    <div class="exp-card">
-                        <div class="exp-header">
-                            <h2>Design Consultant</h2>
-                            <span class="exp-date">WIKA Instruments Pvt. Ltd.</span>
-                        </div>
-                        <p>Worked on design consultation tasks during internship, applying mechanical engineering
-                            background to instrumentation product workflows.</p>
-                    </div>
+                    <div class="timeline">
 
-                    <div class="exp-card">
-                        <div class="exp-header">
-                            <h2>Intern</h2>
-                            <span class="exp-date">Railway Coach Care Center</span>
-                        </div>
-                        <p>Hands-on exposure to maintenance and inspection processes for railway coaches.</p>
-                    </div>
+                        <!-- Experience 1 -->
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
 
-                    <div class="exp-card">
-                        <div class="exp-header">
-                            <h2>Certifications</h2>
+                            <div class="timeline-content">
+                                <span class="timeline-date">Sep 2023 — Feb 2024</span>
+
+                                <h2>Design Consultant (Intern)</h2>
+
+                                <h3>WIKA Instruments Pvt. Ltd.</h3>
+                                <p>
+                                    Gained hands-on experience with industrial product development and engineering
+                                    workflows by helping with design and engineering tasks. Worked together with the
+                                    design team to comprehend product design procedures, precise engineering needs, and
+                                    technical specifications. developed a solid grasp of industry best practices and
+                                    professional design standards while contributing to technical documentation.
+                                </p>
+                            </div>
                         </div>
-                        <ul>
-                            <li>NSIC — AutoCAD</li>
-                            <li>Google Cloud — Generative AI</li>
-                        </ul>
+
+                        <!-- Experience 2 -->
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+
+                            <div class="timeline-content">
+                                <span class="timeline-date">May 2023 — June 2023</span>
+
+                                <h2>Industrial Trainee</h2>
+
+                                <h3>Railway Coach Care Center</h3>
+                                <p>
+                                    I received hands-on experience with railway coach repair and inspection procedures
+                                    while completing industrial training at the Railway Coach Care Center. worked
+                                    alongside RTR machine inspections, took part in train roll-in and roll-out
+                                    operations, and gained a solid understanding of safety procedures, quality
+                                    inspection methods, and preventative maintenance techniques in an industrial
+                                    setting.
+                                </p>
+
+                            </div>
+                        </div>
+
+                        <!-- Certifications -->
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <span class="timeline-date">Certifications</span>
+
+                                <h2>Professional Certifications</h2>
+
+                                <ul>
+                                    <li>NSIC — AutoCAD Certification</li>
+                                    <li>Google Cloud — Generative AI</li>
+                                </ul>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
-
         <div class="status-bar">
             <span><b>Ready</b></span>
             <span><b>Experience.exe</b></span>
