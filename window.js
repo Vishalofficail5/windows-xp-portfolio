@@ -232,8 +232,6 @@ windows.forEach(windowElement => {
 
 // STATIC ENTRIES: apps that don't open a .window (just trigger their existing click behavior)
 const extraApps = [
-    { id: "gameBtn", icon: "assets/icons/game.png", name: "Game" },
-    { id: "songBtn", icon: "assets/icons/Song.png", name: "Lofty" },
 ];
 
 extraApps.forEach(app => {

@@ -1,0 +1,152 @@
+#gameWindow {
+    width: 960px;
+    height: 680px;
+    top: 20px;
+    left: 140px;
+}
+
+#gameWindow .window-content {
+    padding: 0;
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+    position: relative;
+    background: #d4d0c8;
+}
+
+.arcade-view {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px;
+    gap: 20px;
+    overflow-y: auto;
+}
+
+.arcade-header {
+    font-family: Tahoma, sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: #1a1a1a;
+}
+
+.arcade-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 18px;
+    width: 100%;
+    max-width: 760px;
+}
+
+.arcade-tile {
+    background: #d4d0c8;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    padding: 16px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-family: Tahoma, sans-serif;
+}
+
+.arcade-tile:hover {
+    background: #dedad2;
+}
+
+.arcade-tile:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+}
+
+.arcade-tile img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
+.arcade-tile span {
+    font-size: 13px;
+    font-weight: bold;
+    color: #1a1a1a;
+    text-align: center;
+}
+
+.arcade-tile.locked {
+    cursor: not-allowed;
+    opacity: .5;
+}
+
+.arcade-tile.locked:hover {
+    background: #d4d0c8;
+}
+
+.arcade-tile.locked span::after {
+    content: " (Coming soon)";
+    font-weight: normal;
+    font-size: 11px;
+    display: block;
+}
+
+.arcade-play-view {
+    display: none;
+    position: absolute;
+    inset: 0;
+    flex-direction: column;
+}
+
+.arcade-play-topbar {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    background: #d4d0c8;
+    border-bottom: 1px solid #808080;
+}
+
+.arcade-back-btn {
+    font-family: Tahoma, sans-serif;
+    font-size: 12px;
+    background: #d4d0c8;
+    border-top: 1px solid #fff;
+    border-left: 1px solid #fff;
+    border-right: 1px solid #404040;
+    border-bottom: 1px solid #404040;
+    padding: 4px 10px;
+    cursor: pointer;
+}
+
+.arcade-back-btn:active {
+    border-top: 1px solid #404040;
+    border-left: 1px solid #404040;
+    border-right: 1px solid #fff;
+    border-bottom: 1px solid #fff;
+}
+
+.arcade-play-title {
+    font-family: Tahoma, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: #1a1a1a;
+}
+
+.arcade-iframe-wrap {
+    flex: 1;
+    min-height: 0;
+    background: #000;
+}
+
+#arcadeFrame {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+}

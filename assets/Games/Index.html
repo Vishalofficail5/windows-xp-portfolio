@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Highway Racer 3D</title>
+<style>
+  :root{
+    --xp-blue-dark:#0a246a; --xp-blue:#3b74d3; --xp-blue-light:#a6caf0;
+    --xp-face:#ece9d8; --xp-face-dark:#c8c4b8; --xp-border:#0831d9;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;background:#000;font-family:Tahoma,Verdana,sans-serif;overflow:hidden;}
+  #desktop{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#000;}
+
+  #winxp{
+    width:100vw;
+    height:100vh;
+    background:#000;
+    border:none;
+    border-radius:0;
+    box-shadow:none;
+    display:flex;flex-direction:column;
+    overflow:hidden;
+    user-select:none;
+  }
+  /* XP chrome kept in the DOM (game.js binds click listeners to these ids
+     directly and throws if they don't exist) but not rendered. */
+  #titlebar, #menubar, #statusbar{display:none;}
+
+  #stage{flex:1;position:relative;background:#000;overflow:hidden;}
+  #gameCanvas{position:absolute;top:0;left:0;width:100%;height:100%;display:block;}
+
+  .screen{
+    position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;
+    background:linear-gradient(180deg,#0d1b3d,#04040c);color:#eee;padding:20px;overflow:auto;
+  }
+  .screen.active{display:flex;}
+  .screen h1{
+    font-family:"Courier New",monospace;letter-spacing:3px;font-size:clamp(24px,5vw,42px);
+    color:#ffcf3f;text-shadow:0 0 10px #ff8c00,3px 3px 0 #000;margin:0 0 6px 0;
+  }
+  .screen h2{font-family:"Courier New",monospace;color:#7fdcff;margin:4px 0 18px 0;letter-spacing:2px;font-size:15px;}
+  .xp-btn{
+    font-family:Tahoma,sans-serif;font-size:14px;font-weight:bold;color:#fff;
+    background:linear-gradient(180deg,#7db8ff 0%,#3f7ee0 50%,#2058c0 100%);
+    border:1px solid #163e91;border-radius:5px;padding:9px 26px;margin:6px;cursor:pointer;
+    box-shadow:0 2px 3px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.5);
+    min-width:220px;
+  }
+  .xp-btn:hover{filter:brightness(1.12);}
+  .xp-btn:active{filter:brightness(0.9);transform:translateY(1px);}
+  .xp-btn.small{min-width:110px;padding:6px 12px;font-size:12px;}
+  .xp-btn:disabled{filter:grayscale(1) brightness(.6);cursor:not-allowed;}
+
+  .menu-col{display:flex;flex-direction:column;align-items:center;}
+
+  #hud{
+    position:absolute;top:0;left:0;right:0;display:none;justify-content:space-between;
+    padding:8px 14px;font-family:"Courier New",monospace;color:#fff;font-size:13px;pointer-events:none;
+    text-shadow:1px 1px 2px #000;
+  }
+  #hud .box{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.25);border-radius:4px;padding:4px 10px;}
+  #nitroWrap{width:160px;height:12px;border:1px solid #fff;border-radius:3px;overflow:hidden;background:rgba(0,0,0,.5);}
+  #nitroBar{height:100%;width:100%;background:linear-gradient(90deg,#00f0ff,#0060ff);}
+
+  .car-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;width:min(90%,760px);max-height:46vh;overflow-y:auto;padding:8px;background:rgba(255,255,255,.05);border:1px solid #333;border-radius:6px;}
+  .car-card{background:#101a30;border:2px solid #234;border-radius:6px;padding:8px;text-align:center;cursor:pointer;font-family:"Courier New",monospace;font-size:11px;}
+  .car-card.locked{opacity:.45;cursor:not-allowed;}
+  .car-card.selected{border-color:#ffcf3f;box-shadow:0 0 8px #ffcf3f;}
+  .car-swatch{width:100%;height:44px;border-radius:4px;margin-bottom:6px;}
+
+  .upgrade-row{display:flex;align-items:center;justify-content:space-between;width:320px;margin:5px 0;font-family:"Courier New",monospace;font-size:12px;background:rgba(255,255,255,.05);padding:6px 10px;border-radius:4px;}
+  .pips{display:flex;gap:2px;}
+  .pip{width:10px;height:10px;border-radius:2px;background:#333;border:1px solid #555;}
+  .pip.on{background:#ffcf3f;border-color:#c99;}
+
+  table.board{border-collapse:collapse;font-family:"Courier New",monospace;font-size:13px;width:min(90%,480px);}
+  table.board th,table.board td{border-bottom:1px solid #345;padding:5px 10px;text-align:left;}
+  table.board th{color:#7fdcff;}
+
+  .ach-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;width:min(92%,780px);max-height:52vh;overflow-y:auto;}
+  .ach-item{background:rgba(255,255,255,.05);border:1px solid #333;border-radius:6px;padding:8px 10px;font-family:"Courier New",monospace;font-size:12px;display:flex;gap:8px;align-items:center;}
+  .ach-item.locked{opacity:.35;}
+  .ach-icon{font-size:20px;}
+
+  .theme-grid{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;max-width:700px;}
+  .theme-card{width:140px;padding:10px;border:2px solid #234;border-radius:6px;text-align:center;cursor:pointer;font-family:"Courier New",monospace;font-size:12px;background:#101a30;}
+  .theme-card:hover{border-color:#7fdcff;}
+  .theme-swatch{height:60px;border-radius:4px;margin-bottom:6px;}
+
+  #statusbar{display:none;}
+  #crashFlash{position:absolute;inset:0;background:#ff0000;opacity:0;pointer-events:none;}
+  #loadingScreen{position:absolute;inset:0;z-index:50;background:#000;color:#0f0;font-family:"Courier New",monospace;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;}
+  #loadingBar{width:260px;height:14px;border:1px solid #0f0;margin-top:10px;}
+  #loadingFill{height:100%;width:0%;background:#0f0;}
+  #boot-hidden{display:none;}
+</style>
+</head>
+<body>
+<div id="desktop">
+  <div id="winxp">
+    <div id="titlebar">
+      <div class="tleft"><div class="ticon"></div><span>Highway Racer 3D</span></div>
+      <div class="tbtns">
+        <div class="tbtn" id="btnMin">_</div>
+        <div class="tbtn" id="btnMax">□</div>
+        <div class="tbtn close" id="btnClose">×</div>
+      </div>
+    </div>
+    <div id="menubar"><span>Game</span><span>Garage</span><span>Achievements</span><span>Help</span></div>
+
+    <div id="stage">
+      <canvas id="gameCanvas"></canvas>
+      <div id="crashFlash"></div>
+
+      <div id="hud">
+        <div class="box">SCORE <span id="hudScore">0</span></div>
+        <div class="box">COINS <span id="hudCoins">0</span></div>
+        <div class="box">
+          NITRO
+          <div id="nitroWrap"><div id="nitroBar"></div></div>
+        </div>
+        <div class="box">SPEED <span id="hudSpeed">0</span> km/h</div>
+      </div>
+
+      <div id="loadingScreen">
+        <div>LOADING HIGHWAY RACER 3D...</div>
+        <div id="loadingBar"><div id="loadingFill"></div></div>
+      </div>
+
+      <div class="screen" id="screenMenu">
+        <h1>HIGHWAY RACER 3D</h1>
+        <h2>&gt; Windows Racing Simulator &lt;</h2>
+        <div class="menu-col">
+          <button class="xp-btn" id="btnPlay">▶ PLAY</button>
+          <button class="xp-btn" id="btnGarage">🔧 GARAGE</button>
+          <button class="xp-btn" id="btnAch">🏆 ACHIEVEMENTS</button>
+          <button class="xp-btn" id="btnBoard">📊 HIGH SCORES</button>
+        </div>
+        <div style="margin-top:14px;font-size:11px;color:#789;font-family:'Courier New',monospace;">
+          Coins: <span id="menuCoins">0</span> &nbsp;|&nbsp; Cars Unlocked: <span id="menuCars">1</span>/12
+        </div>
+      </div>
+
+      <div class="screen" id="screenTheme">
+        <h1 style="font-size:24px;">SELECT HIGHWAY</h1>
+        <div class="theme-grid" id="themeGrid"></div>
+        <button class="xp-btn small" id="btnThemeBack" style="margin-top:16px;">← BACK</button>
+      </div>
+
+      <div class="screen" id="screenGarage">
+        <h1 style="font-size:24px;">GARAGE</h1>
+        <div class="car-grid" id="carGrid"></div>
+        <div id="upgradesWrap" style="margin-top:14px;"></div>
+        <button class="xp-btn small" id="btnGarageBack" style="margin-top:10px;">← BACK</button>
+      </div>
+
+      <div class="screen" id="screenAch">
+        <h1 style="font-size:24px;">ACHIEVEMENTS</h1>
+        <div class="ach-list" id="achList"></div>
+        <button class="xp-btn small" id="btnAchBack" style="margin-top:14px;">← BACK</button>
+      </div>
+
+      <div class="screen" id="screenBoard">
+        <h1 style="font-size:24px;">HIGH SCORES</h1>
+        <table class="board"><thead><tr><th>#</th><th>NAME</th><th>SCORE</th><th>DATE</th></tr></thead><tbody id="boardBody"></tbody></table>
+        <button class="xp-btn small" id="btnBoardBack" style="margin-top:14px;">← BACK</button>
+      </div>
+
+      <div class="screen" id="screenPause">
+        <h1 style="font-size:26px;">PAUSED</h1>
+        <div class="menu-col">
+          <button class="xp-btn" id="btnResume">▶ RESUME</button>
+          <button class="xp-btn" id="btnRestart">↻ RESTART</button>
+          <button class="xp-btn" id="btnQuitMenu">■ QUIT TO MENU</button>
+        </div>
+      </div>
+
+      <div class="screen" id="screenOver">
+        <h1 style="color:#ff5050;">CRASHED!</h1>
+        <h2 id="overScore">Score: 0</h2>
+        <div id="overNew" style="display:none;color:#ffcf3f;font-family:'Courier New',monospace;margin-bottom:10px;">🏆 NEW HIGH SCORE!</div>
+        <div class="menu-col">
+          <button class="xp-btn" id="btnRetry">↻ RETRY</button>
+          <button class="xp-btn" id="btnOverMenu">■ MAIN MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="statusbar"><span id="statusLeft">Ready</span><span id="statusFps">60 FPS</span></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

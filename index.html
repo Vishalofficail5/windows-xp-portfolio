@@ -7,7 +7,8 @@
     <title>Windows 95-portfolio</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="window.css">
-    <link rel="stylesheet" href="song.css">
+    <link rel="stylesheet" href="Song.css">
+    <link rel="stylesheet" href="arcade.css">
 </head>
 
 <body>
@@ -386,6 +387,58 @@
         </div>
     </div>
 
+    <!--GAMES WINDOW -->
+    <div class="window" id="gameWindow" data-window="game">
+
+        <div class="title-bar">
+            <div class="title-left">
+                <img src="assets/icons/game.png" alt="Arcade">
+                <span class="window-title">Game</span>
+            </div>
+            <div class="title-buttons">
+                <div class="title-btn">
+                    <button class="minimizeBtn"><img src="assets/icons/mini.PNG" alt="Minimize"></button>
+                    <span class="btn-tooltip">Minimize</span>
+                </div>
+                <div class="title-btn">
+                    <button class="maximizeBtn"><img src="assets/icons/max.PNG" alt="Maximize"></button>
+                    <span class="btn-tooltip">Maximize</span>
+                </div>
+                <div class="title-btn">
+                    <button class="closeBtn"><img src="assets/icons/Close.PNG" alt="Close"></button>
+                    <span class="btn-tooltip">Close</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="window-body">
+            <div class="window-content">
+
+                <!-- GAME PICKER -->
+                <div class="arcade-view" id="arcadeView">
+                    <div class="arcade-header">Select a Game</div>
+                    <div class="arcade-grid" id="arcadeGrid"></div>
+                </div>
+
+                <!-- ACTIVE GAME -->
+                <div class="arcade-play-view" id="arcadePlayView">
+                    <div class="arcade-play-topbar">
+                        <button class="arcade-back-btn" id="arcadeBackBtn">‹ Back to Arcade</button>
+                        <span class="arcade-play-title" id="arcadeGameTitle"></span>
+                    </div>
+                    <div class="arcade-iframe-wrap">
+                        <iframe id="arcadeFrame" title="Game"></iframe>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="status-bar">
+            <span><b>Ready</b></span>
+            <span><b>Arcade.exe</b></span>
+        </div>
+    </div>
+
     <!-- LOTIFY (SONG) WINDOW -->
     <div class="window" id="songWindow" data-window="song">
 
@@ -418,11 +471,11 @@
                     <div class="song-lang-card">
                         <div class="song-lang-titlebar">Select Language</div>
                         <div class="song-lang-body">
-                            <img src="assets/icons/Song.png" alt="Lotify" class="song-lang-icon">
-                            <p>Choose which library to load:</p>
+                            <img src="assets/icons/disc.png" alt="Lotify" class="song-lang-icon">
+                            <p><b>Choose which library to load:</b></p>
                             <div class="song-lang-btnrow">
-                                <button class="lang-btn" id="langHindiBtn">Hindi</button>
-                                <button class="lang-btn" id="langEnglishBtn">English</button>
+                                <button class="lang-btn" id="langHindiBtn"><b>Hindi</b></button>
+                                <button class="lang-btn" id="langEnglishBtn"><b>English</b></button>
                             </div>
                         </div>
                     </div>
@@ -436,7 +489,7 @@
                     </div>
 
                     <div class="song-art">
-                        <img id="albumArtImg" class="album-art-img" src="assets/icons/Song.png" alt="Album Art">
+                        <img id="albumArtImg" class="album-art-img" src="assets/icons/dics1.png" alt="Album Art">
                         <div class="song-eq" id="songEq"></div>
                         <button class="heart-btn" id="heartBtn">&#10084;</button>
                     </div>
@@ -636,5 +689,6 @@
 <script src="Terminal.js"></script>
 <script src="Clock.js"></script>
 <script src="Song.js"></script>
+<script src="arcade.js"></script>
 
 </html>

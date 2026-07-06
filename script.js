@@ -15,10 +15,7 @@ document.getElementById("experienceBtn").addEventListener("click", function () {
 document.getElementById("contactBtn").addEventListener("click", function () {
     //alert("Contact Clicked");
 });
-// Game
-document.getElementById("gameBtn").addEventListener("click", function () {
-    alert("Game Clicked");
-});
+// Game (opens the Arcade window on double-click — see desktop.js)
 // Song
 document.getElementById("songBtn").addEventListener("click", function () {
     //alert("Song Clicked");

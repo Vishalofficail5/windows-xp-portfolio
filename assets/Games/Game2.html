@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DEAD MANSION</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:100%; height:100%; overflow:hidden; background:#000; font-family: 'Courier New', monospace; }
+  #gameCanvas { display:block; width:100%; height:100%; }
+
+  #hud {
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    pointer-events:none; color:#d8d0c0; z-index:10; user-select:none;
+  }
+
+  /* crosshair */
+  #crosshair {
+    position:absolute; top:50%; left:50%; width:20px; height:20px;
+    transform:translate(-50%,-50%);
+  }
+  #crosshair:before, #crosshair:after {
+    content:''; position:absolute; background:rgba(200,30,30,0.85);
+  }
+  #crosshair:before { top:9px; left:0; width:20px; height:2px; }
+  #crosshair:after { top:0; left:9px; width:2px; height:20px; }
+  #crosshair.hitflash:before, #crosshair.hitflash:after { background:#ff2b2b; }
+
+  /* top-left status */
+  #statusPanel {
+    position:absolute; top:16px; left:16px; padding:10px 16px;
+    background:linear-gradient(135deg, rgba(20,14,10,0.75), rgba(20,14,10,0.45));
+    border:1px solid rgba(120,30,20,0.6); border-radius:3px; min-width:220px;
+  }
+  #healthLabel { font-size:11px; letter-spacing:3px; color:#a89a80; margin-bottom:4px; }
+  #healthBarOuter { width:200px; height:14px; background:#1a1512; border:1px solid #4a3a2a; position:relative; }
+  #healthBarInner { height:100%; background:linear-gradient(90deg,#7a1414,#c22626); width:100%; transition:width 0.25s; }
+  #healthNum { position:absolute; right:4px; top:-1px; font-size:11px; color:#fff; text-shadow:1px 1px 1px #000;}
+
+  #floorLabel { margin-top:8px; font-size:12px; letter-spacing:2px; color:#8a7a60; }
+
+  #scorePanel {
+    position:absolute; top:16px; right:16px; padding:10px 18px;
+    background:linear-gradient(135deg, rgba(20,14,10,0.75), rgba(20,14,10,0.45));
+    border:1px solid rgba(120,30,20,0.6); border-radius:3px; text-align:right;
+  }
+  #scoreVal { font-size:26px; color:#e8c766; letter-spacing:2px; text-shadow:0 0 6px rgba(230,180,60,0.4); }
+  #scoreLabel { font-size:10px; letter-spacing:3px; color:#8a7a60; }
+  #killCount { font-size:11px; color:#a89a80; margin-top:4px; }
+
+  #stairPrompt {
+    position:absolute; bottom:22%; left:50%; transform:translateX(-50%);
+    background:rgba(10,8,6,0.8); border:1px solid #6a4a2a; padding:8px 16px;
+    font-size:13px; letter-spacing:1px; color:#e0d0a0; display:none; border-radius:2px;
+  }
+  #stairPrompt kbd {
+    background:#2a2018; border:1px solid #6a4a2a; padding:1px 6px; border-radius:2px; color:#e8c766;
+  }
+
+  #floatScores { position:absolute; top:0; left:0; width:100%; height:100%; }
+  .floatScore {
+    position:absolute; font-size:20px; font-weight:bold; color:#e8c766;
+    text-shadow:0 0 6px rgba(0,0,0,0.8); animation:floatUp 0.9s ease-out forwards;
+  }
+  .floatScore.head { color:#ff5252; font-size:24px; }
+  @keyframes floatUp {
+    0% { opacity:1; transform:translate(-50%,-50%) translateY(0); }
+    100% { opacity:0; transform:translate(-50%,-50%) translateY(-60px); }
+  }
+
+  #dangerVignette {
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    box-shadow: inset 0 0 220px rgba(160,0,0,0); pointer-events:none;
+    transition: box-shadow 0.15s;
+  }
+
+  #lowHealthOverlay {
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    box-shadow: inset 0 0 160px rgba(120,0,0,0.55);
+    opacity:0; transition:opacity 0.4s; animation: pulseRed 1.4s infinite;
+  }
+  @keyframes pulseRed { 0%,100%{opacity:0.35} 50%{opacity:0.7} }
+
+  /* overlays */
+  .overlay {
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:radial-gradient(ellipse at center, rgba(30,10,10,0.92), rgba(4,2,2,0.98));
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    color:#e0d0a0; z-index:100; pointer-events:all; text-align:center;
+  }
+  .overlay h1 {
+    font-size:52px; letter-spacing:8px; color:#c22626; text-shadow:0 0 24px rgba(194,38,38,0.6);
+    margin-bottom:10px; font-weight:900;
+  }
+  .overlay h2 { font-size:20px; letter-spacing:4px; color:#a89a80; margin-bottom:26px; font-weight:normal;}
+  .overlay p { max-width:480px; font-size:13px; line-height:1.9; color:#9a8c72; margin-bottom:8px; letter-spacing:0.5px;}
+  .overlay .keys { color:#e8c766; }
+  .playBtn {
+    margin-top:22px; padding:14px 46px; font-size:16px; letter-spacing:4px;
+    background:linear-gradient(180deg,#8a1c1c,#5a1010); border:1px solid #c22626; color:#f0e0c0;
+    cursor:pointer; font-family:inherit; pointer-events:all; border-radius:2px;
+    text-transform:uppercase;
+  }
+  .playBtn:hover { background:linear-gradient(180deg,#a52222,#701414); }
+  .statLine { font-size:15px; margin:4px 0; color:#c9b98a; letter-spacing:1px;}
+  .statLine b { color:#e8c766; }
+  #hidden { display:none; }
+  #loadingMsg { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); color:#8a7a60; letter-spacing:3px; z-index:200;}
+</style>
+</head>
+<body>
+
+<div id="loadingMsg">LOADING MANSION...</div>
+<canvas id="gameCanvas"></canvas>
+
+<div id="hud">
+  <div id="crosshair"></div>
+  <div id="statusPanel">
+    <div id="healthLabel">HEALTH</div>
+    <div id="healthBarOuter"><div id="healthBarInner"></div><div id="healthNum">100</div></div>
+    <div id="floorLabel">GROUND FLOOR</div>
+  </div>
+  <div id="scorePanel">
+    <div id="scoreLabel">SCORE</div>
+    <div id="scoreVal">0</div>
+    <div id="killCount">Kills: 0</div>
+  </div>
+  <div id="stairPrompt"></div>
+  <div id="floatScores"></div>
+  <div id="dangerVignette"></div>
+  <div id="lowHealthOverlay"></div>
+</div>
+
+<div class="overlay" id="startOverlay">
+  <h1>DEAD MANSION</h1>
+  <h2>THEY DON'T STOP COMING</h2>
+  <p>You're trapped inside a cramped old mansion — ground floor, two upper floors and an attic — and the dead have gotten in. There is no escape, only survival. Kill zombies for points, aim for the head for bonus points. Find medkits scattered through the house to stay alive.</p>
+  <p><span class="keys">WASD</span> move &nbsp;|&nbsp; <span class="keys">MOUSE</span> look &nbsp;|&nbsp; <span class="keys">CLICK</span> shoot &nbsp;|&nbsp; <span class="keys">E</span> go upstairs &nbsp;|&nbsp; <span class="keys">Q</span> go downstairs</p>
+  <button class="playBtn" id="playBtn">Enter the Mansion</button>
+</div>
+
+<div class="overlay" id="pausedOverlay" style="display:none;">
+  <h1 style="font-size:36px;">PAUSED</h1>
+  <button class="playBtn" id="resumeBtn">Resume</button>
+</div>
+
+<div class="overlay" id="gameOverOverlay" style="display:none;">
+  <h1>YOU DIED</h1>
+  <div class="statLine">Final Score: <b id="finalScore">0</b></div>
+  <div class="statLine">Zombies Killed: <b id="finalKills">0</b></div>
+  <div class="statLine">Headshots: <b id="finalHeadshots">0</b></div>
+  <div class="statLine">Time Survived: <b id="finalTime">0s</b></div>
+  <button class="playBtn" id="restartBtn">Try Again</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+window.addEventListener('error', function(e){
+  var box = document.getElementById('loadingMsg');
+  box.style.display = 'block';
+  box.style.color = '#ff6060';
+  box.style.maxWidth = '80%';
+  box.textContent = 'Something failed to load: ' + e.message + ' (check your internet connection / ad-blocker, then reload)';
+});
+if (typeof THREE === 'undefined') {
+  var box = document.getElementById('loadingMsg');
+  box.style.display = 'block';
+  box.style.color = '#ff6060';
+  box.textContent = 'The 3D library failed to load from the CDN. Check your internet connection or try disabling any ad-blocker/script-blocker, then reload the page.';
+} else {
+(function(){
+"use strict";
+
+/* ===================== CONSTANTS ===================== */
+const FLOOR_HEIGHT = 3.6;
+const TOP_FLOOR = 3; // 0 ground,1,2,3 attic
+const FLOOR_BASE = [0, FLOOR_HEIGHT, FLOOR_HEIGHT*2, FLOOR_HEIGHT*3];
+const FLOOR_NAMES = ["GROUND FLOOR","SECOND FLOOR","THIRD FLOOR","ATTIC"];
+const EYE_HEIGHT = 1.65;
+const STAIR_ZONE = {minX:6.6,maxX:9.4,minZ:6.6,maxZ:9.4};
+const BUILD_MIN = -10, BUILD_MAX = 10;
+const PLAYER_RADIUS = 0.35;
+const ZOMBIE_RADIUS = 0.4;
+
+/* ===================== BASIC SETUP ===================== */
+const canvas = document.getElementById('gameCanvas');
+const renderer = new THREE.WebGLRenderer({canvas:canvas, antialias:false, powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,1));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = false;
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x030202, 0.065);
+
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.05, 45);
+
+// yaw/pitch rig for FPS look
+const pitchObject = new THREE.Object3D();
+pitchObject.add(camera);
+const yawObject = new THREE.Object3D();
+yawObject.add(pitchObject);
+yawObject.position.set(0, FLOOR_BASE[0]+EYE_HEIGHT, -6);
+scene.add(yawObject);
+
+// flashlight attached to camera
+const flashlight = new THREE.SpotLight(0xfff0d0, 1.6, 16, Math.PI/6.2, 0.5, 1.4);
+flashlight.position.set(0,0,0.2);
+camera.add(flashlight);
+flashlight.target.position.set(0,0,-1);
+camera.add(flashlight.target);
+
+const ambient = new THREE.AmbientLight(0x1c2230, 0.55);
+scene.add(ambient);
+const hemi = new THREE.HemisphereLight(0x33394a, 0x0a0806, 0.25);
+scene.add(hemi);
+
+window.addEventListener('resize', ()=>{
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+/* ===================== AUDIO (synth, no external files) ===================== */
+let actx = null;
+function ensureAudio(){ if(!actx){ actx = new (window.AudioContext||window.webkitAudioContext)(); } }
+function beep(freq, dur, type, gainVal, slideTo){
+  if(!actx) return;
+  const t0 = actx.currentTime;
+  const osc = actx.createOscillator();
+  const gain = actx.createGain();
+  osc.type = type||'square';
+  osc.frequency.setValueAtTime(freq, t0);
+  if(slideTo) osc.frequency.exponentialRampToValueAtTime(Math.max(slideTo,1), t0+dur);
+  gain.gain.setValueAtTime(gainVal||0.2, t0);
+  gain.gain.exponentialRampToValueAtTime(0.001, t0+dur);
+  osc.connect(gain); gain.connect(actx.destination);
+  osc.start(t0); osc.stop(t0+dur);
+}
+function noiseBurst(dur, gainVal){
+  if(!actx) return;
+  const bufferSize = actx.sampleRate*dur;
+  const buffer = actx.createBuffer(1, bufferSize, actx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for(let i=0;i<bufferSize;i++){ data[i] = (Math.random()*2-1) * (1-i/bufferSize); }
+  const src = actx.createBufferSource(); src.buffer = buffer;
+  const gain = actx.createGain(); gain.gain.setValueAtTime(gainVal||0.3, actx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+dur);
+  src.connect(gain); gain.connect(actx.destination); src.start();
+}
+function sfxShoot(){ noiseBurst(0.12,0.5); beep(180,0.1,'square',0.25,60); }
+function sfxZombieHit(){ beep(90,0.18,'sawtooth',0.3,40); }
+function sfxHeadshot(){ beep(700,0.09,'square',0.25,1400); beep(90,0.18,'sawtooth',0.25,40); }
+function sfxPlayerHurt(){ noiseBurst(0.25,0.35); beep(120,0.3,'sawtooth',0.3,50); }
+function sfxPickup(){ beep(440,0.09,'sine',0.25,880); beep(660,0.12,'sine',0.2,990); }
+function sfxGameOver(){ beep(220,0.6,'sawtooth',0.3,40); }
+function sfxStairs(){ beep(300,0.1,'sine',0.15,220); }
+
+/* ===================== MATERIALS (Lambert = much cheaper to shade than Standard) ===================== */
+const wallMat = new THREE.MeshLambertMaterial({color:0x3a3228});
+const wallMat2 = new THREE.MeshLambertMaterial({color:0x342c24});
+const floorMat = new THREE.MeshLambertMaterial({color:0x24201a});
+const ceilMat = new THREE.MeshLambertMaterial({color:0x181410});
+const furnMat = new THREE.MeshLambertMaterial({color:0x2e2418});
+const stairMat = new THREE.MeshLambertMaterial({color:0x4a3a26});
+const railMat = new THREE.MeshLambertMaterial({color:0x1a1512});
+
+/* Merge many small box geometries into one BufferGeometry per floor/material so the
+   GPU gets a handful of draw calls per floor instead of dozens. Rotation isn't needed
+   since every static piece here is axis-aligned, so a translation-only matrix suffices. */
+function mergeGeoms(geoms){
+  let posLen=0, normLen=0;
+  const nonIndexed = geoms.map(g=> g.index ? g.toNonIndexed() : g);
+  for(const g of nonIndexed){ posLen += g.attributes.position.array.length; normLen += g.attributes.normal.array.length; }
+  const posOut = new Float32Array(posLen);
+  const normOut = new Float32Array(normLen);
+  let po=0, no=0;
+  for(const g of nonIndexed){
+    posOut.set(g.attributes.position.array, po); po += g.attributes.position.array.length;
+    normOut.set(g.attributes.normal.array, no); no += g.attributes.normal.array.length;
+  }
+  const merged = new THREE.BufferGeometry();
+  merged.setAttribute('position', new THREE.BufferAttribute(posOut,3));
+  merged.setAttribute('normal', new THREE.BufferAttribute(normOut,3));
+  return merged;
+}
+
+/* ===================== MANSION BUILDER ===================== */
+const collidersByFloor = [[],[],[],[]];
+const floorGroups = [];
+const geomBuckets = [ {wall:[],furn:[],stair:[]}, {wall:[],furn:[],stair:[]}, {wall:[],furn:[],stair:[]}, {wall:[],furn:[],stair:[]} ];
+
+function bakeGeom(floorIdx, bucket, geo, x, y, z){
+  const g = geo.clone();
+  g.translate(x,y,z);
+  geomBuckets[floorIdx][bucket].push(g);
+}
+
+function addWallSeg(floorIdx, x1,z1,x2,z2, height){
+  const thickness = 0.3;
+  let cx,cz,w,d;
+  if (Math.abs(z1-z2) < 0.001){ cx=(x1+x2)/2; cz=z1; w=Math.abs(x2-x1)+thickness; d=thickness; }
+  else { cx=x1; cz=(z1+z2)/2; w=thickness; d=Math.abs(z2-z1)+thickness; }
+  const geo = new THREE.BoxGeometry(w,height,d);
+  bakeGeom(floorIdx, 'wall', geo, cx, height/2, cz);
+  collidersByFloor[floorIdx].push({minX:cx-w/2,maxX:cx+w/2,minZ:cz-d/2,maxZ:cz+d/2});
+}
+
+function addBox(floorIdx, x,z,w,d,h, bucket, yOffset){
+  const geo = new THREE.BoxGeometry(w,h,d);
+  bakeGeom(floorIdx, bucket||'furn', geo, x, (yOffset||0)+h/2, z);
+  collidersByFloor[floorIdx].push({minX:x-w/2,maxX:x+w/2,minZ:z-d/2,maxZ:z+d/2});
+}
+
+function flushFloor(floorIdx){
+  const b = geomBuckets[floorIdx];
+  const wallMaterial = floorIdx % 2 === 0 ? wallMat : wallMat2;
+  if(b.wall.length){ floorGroups[floorIdx].add(new THREE.Mesh(mergeGeoms(b.wall), wallMaterial)); }
+  if(b.furn.length){ floorGroups[floorIdx].add(new THREE.Mesh(mergeGeoms(b.furn), furnMat)); }
+  if(b.stair.length){ floorGroups[floorIdx].add(new THREE.Mesh(mergeGeoms(b.stair), stairMat)); }
+}
+
+function buildFlatFloorPlane(floorIdx, height){
+  const floorGeo = new THREE.PlaneGeometry(20,20);
+  const floorMesh = new THREE.Mesh(floorGeo, floorMat);
+  floorMesh.rotation.x = -Math.PI/2;
+  floorMesh.position.set(0,0.01,0);
+  floorGroups[floorIdx].add(floorMesh);
+
+  const ceilGeo = new THREE.PlaneGeometry(20,20);
+  const ceilMesh = new THREE.Mesh(ceilGeo, ceilMat);
+  ceilMesh.rotation.x = Math.PI/2;
+  ceilMesh.position.set(0,height-0.02,0);
+  floorGroups[floorIdx].add(ceilMesh);
+}
+
+function buildStandardFloor(floorIdx, height){
+  buildFlatFloorPlane(floorIdx, height);
+  // perimeter
+  addWallSeg(floorIdx, -10,-10, 10,-10, height);
+  addWallSeg(floorIdx, -10, 10, 10, 10, height);
+  addWallSeg(floorIdx, -10,-10,-10, 10, height);
+  addWallSeg(floorIdx,  10,-10, 10, 10, height);
+  // left corridor wall (x=-1) with door gaps
+  addWallSeg(floorIdx, -1,-10, -1,-6, height);
+  addWallSeg(floorIdx, -1,-4, -1, 0, height);
+  addWallSeg(floorIdx, -1, 2, -1, 6, height);
+  addWallSeg(floorIdx, -1, 8, -1,10, height);
+  // right corridor wall (x=1) with door gaps
+  addWallSeg(floorIdx, 1,-10, 1,-7, height);
+  addWallSeg(floorIdx, 1,-5, 1,-1, height);
+  addWallSeg(floorIdx, 1, 1, 1, 4, height);
+  addWallSeg(floorIdx, 1, 6, 1,10, height);
+  // room dividers left
+  addWallSeg(floorIdx, -10,-4, -1,-4, height);
+  addWallSeg(floorIdx, -10, 3, -1, 3, height);
+  // room dividers right
+  addWallSeg(floorIdx, 1,-5, 10,-5, height);
+  addWallSeg(floorIdx, 1, 4, 10, 4, height);
+
+  // furniture / obstacles
+  addBox(floorIdx, -5.5,-7, 2.4,1.2,0.9, 'furn'); // table roomL1
+  addBox(floorIdx, -5.5,-0.5, 2.6,1.1,0.85, 'furn'); // roomL2
+  addBox(floorIdx, -5,6.5, 1.4,1.4,1.1, 'furn'); // roomL3 crate
+  addBox(floorIdx, 5.5,-7.5, 2.4,1,0.8, 'furn'); // roomR1
+  addBox(floorIdx, 5,-0.5, 1.3,1.3,1.4, 'furn'); // roomR2 cabinet
+  addBox(floorIdx, 4,6.5, 2,1,0.9, 'furn'); // roomR3
+
+  // small flicker light per floor (kept to one for performance)
+  addFlickerLight(floorIdx, 0,height-0.6, 2, 0xffb060);
+
+  buildStairsMesh(floorIdx, height);
+  flushFloor(floorIdx);
+}
+
+function buildAttic(floorIdx, height){
+  buildFlatFloorPlane(floorIdx, height);
+  addWallSeg(floorIdx, -10,-10, 10,-10, height);
+  addWallSeg(floorIdx, -10, 10, 10, 10, height);
+  addWallSeg(floorIdx, -10,-10,-10, 10, height);
+  addWallSeg(floorIdx,  10,-10, 10, 10, height);
+  // a couple partial partitions, open loft feel
+  addWallSeg(floorIdx, -10,-2, -3,-2, height);
+  addWallSeg(floorIdx, 3,2, 10,2, height);
+  // crates / clutter
+  addBox(floorIdx, -6,4, 1.2,1.2,1.0, 'furn');
+  addBox(floorIdx, -3,-6, 1.6,1.2,0.9, 'furn');
+  addBox(floorIdx, 6,-4, 1.4,1.4,1.1, 'furn');
+  addBox(floorIdx, 2,6, 1.2,1.2,0.8, 'furn');
+  // roof beams (decorative, above head height, no collider)
+  for(let bz=-9; bz<=9; bz+=4.5){
+    bakeGeom(floorIdx, 'stair', new THREE.BoxGeometry(20,0.25,0.3), 0, height-0.35, bz);
+  }
+  addFlickerLight(floorIdx, 0,height-0.6,0, 0xffcf90);
+  buildStairsMesh(floorIdx, height, true);
+  flushFloor(floorIdx);
+}
+
+function addFlickerLight(floorIdx, x,y,z, color){
+  const light = new THREE.PointLight(color, 1.1, 9, 2);
+  light.position.set(x,y,z);
+  floorGroups[floorIdx].add(light);
+  light.userData.baseIntensity = 1.1 + Math.random()*0.3;
+  light.userData.flickerSeed = Math.random()*100;
+  flickerLights.push(light);
+}
+const flickerLights = [];
+
+function buildStairsMesh(floorIdx, height, isTop){
+  // decorative staircase box-steps in the stair nook, visual only (no collider - handled by trigger)
+  const stepCount = 10;
+  for(let i=0;i<stepCount;i++){
+    bakeGeom(floorIdx, 'stair', new THREE.BoxGeometry(1.8,0.28,0.34), 8, i*(height/stepCount)+0.14, 6.9 + i*0.28);
+  }
+  if(isTop){
+    bakeGeom(floorIdx, 'stair', new THREE.BoxGeometry(2,0.15,2), 8, height-0.1, 8);
+  }
+  // nook railing marker
+  bakeGeom(floorIdx, 'stair', new THREE.BoxGeometry(0.15, 0.9, 2.6), 6.6, 0.45, 8);
+}
+
+for(let f=0; f<=TOP_FLOOR; f++){
+  const g = new THREE.Group();
+  g.position.y = FLOOR_BASE[f];
+  scene.add(g);
+  floorGroups.push(g);
+}
+buildStandardFloor(0, FLOOR_HEIGHT);
+buildStandardFloor(1, FLOOR_HEIGHT);
+buildStandardFloor(2, FLOOR_HEIGHT);
+buildAttic(3, FLOOR_HEIGHT - 0.4);
+
+// Perf: only the floor the player is on (and its lights) should ever be rendered.
+// Three.js skips a whole subtree (including lights) when a parent's .visible is false,
+// so this alone cuts GPU work roughly 4x versus rendering all floors at once.
+function setActiveFloor(f){
+  for(let i=0;i<floorGroups.length;i++){ floorGroups[i].visible = (i===f); }
+}
+setActiveFloor(0);
+
+/* exterior ambient ground so it doesn't look like void outside windows (there are none, but just in case) */
+scene.background = new THREE.Color(0x030202);
+
+/* ===================== COLLISION HELPERS ===================== */
+function resolveCollisions(pos, colliders, radius){
+  for(let i=0;i<colliders.length;i++){
+    const c = colliders[i];
+    const closestX = Math.max(c.minX, Math.min(pos.x, c.maxX));
+    const closestZ = Math.max(c.minZ, Math.min(pos.z, c.maxZ));
+    const dx = pos.x - closestX;
+    const dz = pos.z - closestZ;
+    const distSq = dx*dx + dz*dz;
+    if (distSq < radius*radius){
+      const dist = Math.sqrt(distSq) || 0.0001;
+      const overlap = radius - dist;
+      pos.x += (dx/dist) * overlap;
+      pos.z += (dz/dist) * overlap;
+    }
+  }
+  pos.x = Math.max(BUILD_MIN+0.4, Math.min(BUILD_MAX-0.4, pos.x));
+  pos.z = Math.max(BUILD_MIN+0.4, Math.min(BUILD_MAX-0.4, pos.z));
+}
+
+function inStairZone(x,z){
+  return x>=STAIR_ZONE.minX && x<=STAIR_ZONE.maxX && z>=STAIR_ZONE.minZ && z<=STAIR_ZONE.maxZ;
+}
+
+/* ===================== SPAWN ZONES ===================== */
+const SPAWN_ZONES_STD = [
+  {x1:-9,z1:-9,x2:-2,z2:-5},
+  {x1:-9,z1:-3,x2:-2,z2:2},
+  {x1:-9,z1:4,x2:-2,z2:9},
+  {x1:2,z1:-9,x2:9,z2:-6},
+  {x1:2,z1:-4,x2:9,z2:3},
+  {x1:2,z1:5,x2:5.8,z2:9},
+];
+const SPAWN_ZONES_ATTIC = [
+  {x1:-9,z1:-9,x2:-3,z2:-2.2},
+  {x1:-9,z1:-1,x2:9,z2:1.6},
+  {x1:3,z1:2.4,x2:9,z2:9},
+  {x1:-9,z1:2.4,x2:2.6,z2:9},
+];
+function getZonesForFloor(f){ return f===3 ? SPAWN_ZONES_ATTIC : SPAWN_ZONES_STD; }
+function randomPointInFloor(f){
+  const zones = getZonesForFloor(f);
+  const z = zones[Math.floor(Math.random()*zones.length)];
+  return { x: z.x1 + Math.random()*(z.x2-z.x1), z: z.z1 + Math.random()*(z.z2-z.z1) };
+}
+
+/* ===================== PLAYER STATE ===================== */
+const player = {
+  health:100, maxHealth:100, floor:0,
+  score:0, kills:0, headshots:0,
+  alive:true, survivalTime:0,
+};
+
+/* ===================== POINTER LOCK / CONTROLS ===================== */
+let locked = false;
+let gameState = 'start'; // start, playing, paused, gameover
+const keys = {};
+document.addEventListener('keydown', e=>{
+  keys[e.code] = true;
+  if(gameState==='playing'){
+    const px = yawObject.position.x, pz = yawObject.position.z;
+    if(inStairZone(px,pz)){
+      if(e.code==='KeyE' && player.floor < TOP_FLOOR){ changeFloor(player.floor+1); }
+      if(e.code==='KeyQ' && player.floor > 0){ changeFloor(player.floor-1); }
+    }
+  }
+});
+document.addEventListener('keyup', e=>{ keys[e.code]=false; });
+
+let lastFloorChange = 0;
+function changeFloor(newFloor){
+  const now = performance.now();
+  if(now - lastFloorChange < 450) return;
+  lastFloorChange = now;
+  player.floor = newFloor;
+  yawObject.position.y = FLOOR_BASE[newFloor] + EYE_HEIGHT;
+  document.getElementById('floorLabel').textContent = FLOOR_NAMES[newFloor];
+  setActiveFloor(newFloor);
+  for(const m of medkits){ m.mesh.visible = (m.floor === newFloor); }
+  sfxStairs();
+}
+
+canvas.addEventListener('click', ()=>{
+  if(gameState==='start' || gameState==='gameover' || gameState==='paused') return;
+  if(!locked){ canvas.requestPointerLock(); return; }
+  shoot();
+});
+
+document.addEventListener('pointerlockchange', ()=>{
+  locked = document.pointerLockElement === canvas;
+  if(!locked && gameState==='playing'){
+    gameState='paused';
+    document.getElementById('pausedOverlay').style.display='flex';
+  }
+});
+
+const MOUSE_SENS = 0.0022;
+document.addEventListener('mousemove', e=>{
+  if(!locked || gameState!=='playing') return;
+  yawObject.rotation.y -= e.movementX * MOUSE_SENS;
+  pitchObject.rotation.x -= e.movementY * MOUSE_SENS;
+  pitchObject.rotation.x = Math.max(-Math.PI/2.3, Math.min(Math.PI/2.3, pitchObject.rotation.x));
+});
+
+/* ===================== VIEW MODEL GUN ===================== */
+const gunGroup = new THREE.Group();
+const gunBody = new THREE.Mesh(new THREE.BoxGeometry(0.09,0.09,0.32), new THREE.MeshLambertMaterial({color:0x1a1a1a}));
+gunBody.position.set(0.16,-0.14,-0.32);
+const gunGrip = new THREE.Mesh(new THREE.BoxGeometry(0.07,0.14,0.06), new THREE.MeshLambertMaterial({color:0x111111}));
+gunGrip.position.set(0.16,-0.23,-0.24);
+gunGroup.add(gunBody, gunGrip);
+camera.add(gunGroup);
+let gunRecoil = 0;
+
+/* ===================== ZOMBIE ===================== */
+/* Body parts (torso/arms/legs) are merged into a single mesh - only the head stays
+   separate, since it needs its own identity for headshot detection. This cuts each
+   zombie from 6 draw calls down to 2. */
+const zombieBodyMat = new THREE.MeshLambertMaterial({color:0x384f2c});
+const zombieSkinMat = new THREE.MeshLambertMaterial({color:0x4a6b3a});
+const zombieBodyGeo = mergeGeoms([
+  new THREE.BoxGeometry(0.55,0.8,0.32).translate(0,1.0,0),      // torso
+  new THREE.BoxGeometry(0.16,0.65,0.16).translate(-0.38,1.05,0), // armL
+  new THREE.BoxGeometry(0.16,0.65,0.16).translate(0.38,1.05,0),  // armR
+  new THREE.BoxGeometry(0.19,0.75,0.19).translate(-0.16,0.38,0), // legL
+  new THREE.BoxGeometry(0.19,0.75,0.19).translate(0.16,0.38,0),  // legR
+]);
+const zombies = [];
+function createZombieMesh(){
+  const group = new THREE.Group();
+  const body = new THREE.Mesh(zombieBodyGeo, zombieBodyMat);
+  group.add(body);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.22,8,6), zombieSkinMat);
+  head.position.y = 1.55;
+  group.add(head);
+  return { group, head, body };
+}
+
+function spawnZombie(){
+  if(zombies.length >= 10) return;
+  // 60% chance same floor as player, else random other floor
+  let floor = player.floor;
+  if(Math.random() > 0.6){ floor = Math.floor(Math.random()*(TOP_FLOOR+1)); }
+  let pt, tries=0;
+  do {
+    pt = randomPointInFloor(floor);
+    tries++;
+  } while(floor===player.floor && dist2(pt.x,pt.z,yawObject.position.x,yawObject.position.z) < 25 && tries < 8);
+
+  const parts = createZombieMesh();
+  parts.group.visible = (floor === player.floor);
+  scene.add(parts.group);
+  const z = {
+    parts, floor,
+    x: pt.x, z: pt.z,
+    health:100,
+    speed: 1.5 + Math.random()*1.0,
+    attackCooldown:0,
+    walkPhase: Math.random()*10,
+    alive:true,
+  };
+  zombies.push(z);
+}
+
+function dist2(x1,z1,x2,z2){ const dx=x1-x2, dz=z1-z2; return dx*dx+dz*dz; }
+
+function removeZombie(z){
+  z.alive = false;
+  scene.remove(z.parts.group);
+  const idx = zombies.indexOf(z);
+  if(idx>=0) zombies.splice(idx,1);
+}
+
+/* ===================== MEDKITS ===================== */
+const medkits = [];
+const MAX_MEDKITS = 4;
+function medkitMesh(){
+  const group = new THREE.Group();
+  const box = new THREE.Mesh(new THREE.BoxGeometry(0.4,0.28,0.28), new THREE.MeshLambertMaterial({color:0xe8e4d8}));
+  group.add(box);
+  const crossH = new THREE.Mesh(new THREE.BoxGeometry(0.24,0.06,0.02), new THREE.MeshLambertMaterial({color:0xc21e1e, emissive:0x501010}));
+  crossH.position.z = 0.15;
+  const crossV = crossH.clone(); crossV.rotation.z = Math.PI/2;
+  group.add(crossH, crossV);
+  const light = new THREE.PointLight(0xff5050, 0.5, 2);
+  light.position.y = 0.3;
+  group.add(light);
+  return group;
+}
+function spawnMedkit(){
+  const floor = Math.floor(Math.random()*(TOP_FLOOR+1));
+  const pt = randomPointInFloor(floor);
+  const mesh = medkitMesh();
+  mesh.position.set(pt.x, FLOOR_BASE[floor]+0.55, pt.z);
+  mesh.visible = (floor === player.floor);
+  scene.add(mesh);
+  medkits.push({ mesh, x:pt.x, z:pt.z, floor });
+}
+for(let i=0;i<MAX_MEDKITS;i++) spawnMedkit();
+
+function respawnMedkitLater(oldFloor){
+  setTimeout(()=>{ if(gameState==='playing') spawnMedkit(); }, 18000 + Math.random()*12000);
+}
+
+/* ===================== SHOOTING ===================== */
+const raycaster = new THREE.Raycaster();
+let shootCooldown = 0;
+function shoot(){
+  if(gameState!=='playing' || shootCooldown>0) return;
+  shootCooldown = 0.32;
+  gunRecoil = 1;
+  sfxShoot();
+
+  const targets = [];
+  for(const z of zombies){
+    if(z.floor !== player.floor) continue;
+    targets.push({mesh:z.parts.head, z, head:true});
+    targets.push({mesh:z.parts.body, z, head:false});
+  }
+  raycaster.setFromCamera({x:0,y:0}, camera);
+  const meshList = targets.map(t=>t.mesh);
+  const hits = raycaster.intersectObjects(meshList, false);
+  if(hits.length>0){
+    const hitMesh = hits[0].object;
+    const found = targets.find(t=>t.mesh===hitMesh);
+    if(found){
+      killZombie(found.z, found.head, hits[0].point);
+      flashCrosshair();
+      return;
+    }
+  }
+}
+function flashCrosshair(){
+  const ch = document.getElementById('crosshair');
+  ch.classList.add('hitflash');
+  setTimeout(()=>ch.classList.remove('hitflash'), 120);
+}
+
+function killZombie(z, headshot, worldPoint){
+  if(!z.alive) return;
+  const pts = headshot ? 150 : 100;
+  player.score += pts;
+  player.kills += 1;
+  if(headshot) player.headshots += 1;
+  if(headshot) sfxHeadshot(); else sfxZombieHit();
+  showFloatScore(worldPoint, pts, headshot);
+  removeZombie(z);
+  updateHUD();
+}
+
+function showFloatScore(worldPoint, pts, headshot){
+  const vector = worldPoint.clone().project(camera);
+  const sx = (vector.x*0.5+0.5) * window.innerWidth;
+  const sy = (-vector.y*0.5+0.5) * window.innerHeight;
+  const el = document.createElement('div');
+  el.className = 'floatScore' + (headshot ? ' head' : '');
+  el.textContent = (headshot? 'HEADSHOT +' : '+') + pts;
+  el.style.left = sx+'px';
+  el.style.top = sy+'px';
+  document.getElementById('floatScores').appendChild(el);
+  setTimeout(()=>el.remove(), 950);
+}
+
+/* ===================== HUD ===================== */
+function updateHUD(){
+  document.getElementById('healthBarInner').style.width = Math.max(0,player.health) + '%';
+  document.getElementById('healthNum').textContent = Math.max(0,Math.round(player.health));
+  document.getElementById('scoreVal').textContent = player.score;
+  document.getElementById('killCount').textContent = 'Kills: ' + player.kills;
+  const low = document.getElementById('lowHealthOverlay');
+  low.style.opacity = player.health <= 30 ? '1' : '0';
+}
+
+/* ===================== DAMAGE / DEATH ===================== */
+function damagePlayer(amount){
+  if(!player.alive) return;
+  player.health -= amount;
+  sfxPlayerHurt();
+  const dv = document.getElementById('dangerVignette');
+  dv.style.boxShadow = 'inset 0 0 260px rgba(200,0,0,0.85)';
+  setTimeout(()=>{ dv.style.boxShadow = 'inset 0 0 220px rgba(160,0,0,0)'; }, 200);
+  if(player.health <= 0){
+    player.health = 0;
+    endGame();
+  }
+  updateHUD();
+}
+
+function healPlayer(amount){
+  player.health = Math.min(player.maxHealth, player.health + amount);
+  sfxPickup();
+  updateHUD();
+}
+
+function endGame(){
+  gameState = 'gameover';
+  player.alive = false;
+  sfxGameOver();
+  document.exitPointerLock();
+  document.getElementById('finalScore').textContent = player.score;
+  document.getElementById('finalKills').textContent = player.kills;
+  document.getElementById('finalHeadshots').textContent = player.headshots;
+  document.getElementById('finalTime').textContent = Math.round(player.survivalTime) + 's';
+  document.getElementById('gameOverOverlay').style.display = 'flex';
+}
+
+/* ===================== SPAWNING TIMER ===================== */
+let spawnTimer = 2.5;
+function getSpawnInterval(){
+  return Math.max(1.1, 4.2 - player.survivalTime*0.018);
+}
+
+/* ===================== GAME LOOP ===================== */
+let lastTime = performance.now();
+function animate(){
+  requestAnimationFrame(animate);
+  const now = performance.now();
+  let delta = (now - lastTime)/1000;
+  delta = Math.min(delta, 0.05);
+  lastTime = now;
+
+  // gun recoil ease
+  if(gunRecoil>0){ gunRecoil = Math.max(0, gunRecoil-delta*6); }
+  gunGroup.position.z = -gunRecoil*0.06;
+  gunGroup.position.y = -gunRecoil*0.02;
+
+  // flicker lights
+  for(const l of flickerLights){
+    const t = now*0.001 + l.userData.flickerSeed;
+    l.intensity = l.userData.baseIntensity * (0.85 + 0.15*Math.sin(t*8) + 0.08*Math.sin(t*23));
+  }
+
+  if(gameState==='playing'){
+    player.survivalTime += delta;
+    if(shootCooldown>0) shootCooldown -= delta;
+
+    updatePlayerMovement(delta);
+    updateZombies(delta);
+    updateMedkitPickup();
+    updateStairPrompt();
+
+    spawnTimer -= delta;
+    if(spawnTimer <= 0){
+      spawnZombie();
+      spawnTimer = getSpawnInterval();
+    }
+  }
+
+  renderer.render(scene, camera);
+}
+
+function updatePlayerMovement(delta){
+  const speed = 4.6;
+  let mx=0, mz=0;
+  if(keys['KeyW']) mz -= 1;
+  if(keys['KeyS']) mz += 1;
+  if(keys['KeyA']) mx -= 1;
+  if(keys['KeyD']) mx += 1;
+  if(mx!==0 || mz!==0){
+    const len = Math.hypot(mx,mz); mx/=len; mz/=len;
+    const yaw = yawObject.rotation.y;
+    const sin = Math.sin(yaw), cos = Math.cos(yaw);
+    const worldX = mx*cos + mz*sin;
+    const worldZ = mz*cos - mx*sin;
+    const pos = yawObject.position;
+    pos.x += worldX * speed * delta;
+    pos.z += worldZ * speed * delta;
+    resolveCollisions(pos, collidersByFloor[player.floor], PLAYER_RADIUS);
+    // gun bob
+    gunGroup.position.x = 0.0 + Math.sin(now_bob())*0.004;
+  }
+}
+let bobT = 0;
+function now_bob(){ bobT += 0.1; return bobT; }
+
+function updateStairPrompt(){
+  const pos = yawObject.position;
+  const el = document.getElementById('stairPrompt');
+  if(inStairZone(pos.x,pos.z)){
+    let msg = '';
+    if(player.floor < TOP_FLOOR) msg += 'Press <kbd>E</kbd> to go upstairs &nbsp; ';
+    if(player.floor > 0) msg += 'Press <kbd>Q</kbd> to go downstairs';
+    el.innerHTML = msg;
+    el.style.display = msg ? 'block' : 'none';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function updateMedkitPickup(){
+  const pos = yawObject.position;
+  for(let i=medkits.length-1;i>=0;i--){
+    const m = medkits[i];
+    if(m.floor !== player.floor) continue;
+    if(dist2(m.x,m.z,pos.x,pos.z) < 1.1){
+      healPlayer(40);
+      scene.remove(m.mesh);
+      medkits.splice(i,1);
+      respawnMedkitLater(m.floor);
+    }
+  }
+}
+
+function updateZombies(delta){
+  const ppos = yawObject.position;
+  for(let i=zombies.length-1;i>=0;i--){
+    const z = zombies[i];
+    if(!z.alive) continue;
+    z.walkPhase += delta*6;
+
+    if(z.floor === player.floor){
+      // chase player directly
+      const dx = ppos.x - z.x, dz = ppos.z - z.z;
+      const d = Math.hypot(dx,dz);
+      if(d > 0.05){
+        const nx = dx/d, nz = dz/d;
+        z.x += nx * z.speed * delta;
+        z.z += nz * z.speed * delta;
+      }
+      // attack
+      if(d < 1.3){
+        z.attackCooldown -= delta;
+        if(z.attackCooldown <= 0){
+          damagePlayer(20);
+          z.attackCooldown = 1.0;
+        }
+      }
+    } else {
+      // move toward stair nook on its own floor, then transition floor
+      const targetX = 8, targetZ = 8;
+      const dx = targetX - z.x, dz = targetZ - z.z;
+      const d = Math.hypot(dx,dz);
+      if(d > 0.6){
+        const nx = dx/d, nz = dz/d;
+        z.x += nx * z.speed * delta;
+        z.z += nz * z.speed * delta;
+      } else {
+        z.floor += (player.floor > z.floor) ? 1 : -1;
+      }
+    }
+
+    const posObj = {x:z.x, z:z.z};
+    resolveCollisions(posObj, collidersByFloor[z.floor], ZOMBIE_RADIUS);
+    z.x = posObj.x; z.z = posObj.z;
+
+    z.parts.group.visible = (z.floor === player.floor);
+    z.parts.group.position.set(z.x, FLOOR_BASE[z.floor], z.z);
+    const dxp = ppos.x - z.x, dzp = ppos.z - z.z;
+    z.parts.group.rotation.y = Math.atan2(dxp, dzp);
+    // lurch animation (whole body sways since limbs are merged into one mesh now)
+    z.parts.body.rotation.z = Math.sin(z.walkPhase)*0.12;
+    z.parts.head.position.y = 1.55 + Math.sin(z.walkPhase*2)*0.02;
+  }
+}
+
+/* ===================== UI WIRING ===================== */
+document.getElementById('playBtn').addEventListener('click', ()=>{
+  ensureAudio();
+  document.getElementById('startOverlay').style.display = 'none';
+  gameState = 'playing';
+  updateHUD();
+  document.getElementById('floorLabel').textContent = FLOOR_NAMES[0];
+  canvas.requestPointerLock();
+});
+document.getElementById('resumeBtn').addEventListener('click', ()=>{
+  document.getElementById('pausedOverlay').style.display = 'none';
+  gameState = 'playing';
+  canvas.requestPointerLock();
+});
+document.getElementById('restartBtn').addEventListener('click', ()=>{
+  window.location.reload();
+});
+
+document.getElementById('loadingMsg').style.display = 'none';
+updateHUD();
+animate();
+
+})();
+}
+</script>
+</body>
+</html>

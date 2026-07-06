@@ -12,6 +12,11 @@ homeBtn.addEventListener("click", () => {
     if (typeof window.stopLotify === "function") {
         window.stopLotify();
     }
+
+    // Same idea for the Arcade window's embedded game.
+    if (typeof window.stopArcadeGame === "function") {
+        window.stopArcadeGame();
+    }
 });
 
 // About
@@ -38,6 +43,11 @@ contactBtn.addEventListener("dblclick", () => openWindow(contactWindow));
 const songBtn = document.getElementById("songBtn");
 const songWindow = document.getElementById("songWindow");
 songBtn.addEventListener("dblclick", () => openWindow(songWindow));
+
+// Arcade (Game)
+const gameBtn = document.getElementById("gameBtn");
+const gameWindow = document.getElementById("gameWindow");
+gameBtn.addEventListener("dblclick", () => openWindow(gameWindow));
 
 // Terminal
 const terminalBtn = document.getElementById("terminalBtn");

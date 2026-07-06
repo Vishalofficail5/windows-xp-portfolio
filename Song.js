@@ -85,7 +85,8 @@
     };
 
 
-    const DEFAULT_ART = "assets/icons/Song.png";
+    const DEFAULT_ART = "assets/icons/dics1.png"; // vinyl record art — update path if you put it in a subfolder
+    const FALLBACK_ART = "assets/icons/Song.png"; // used only if disc1.png doesn't exist yet
 
 
     const VOLUME_ICON_ON = "assets/icons/volume-on.png";
@@ -151,8 +152,69 @@
         songEq.appendChild(bar);
     }
 
+    // ---- floating notes / CRT layer ----
+    const songArt = songEq.parentElement; // the .song-art box from the screenshot
+    const notesLayer = document.createElement("div");
+    notesLayer.className = "song-notes-layer";
+    songArt.appendChild(notesLayer);
+
+    const NOTE_CHARS = ["♪", "♫", "♬", "♩"];
+    let noteTimer = null;
+
+    function spawnNote() {
+        const note = document.createElement("span");
+        note.className = "song-note";
+        note.textContent = NOTE_CHARS[Math.floor(Math.random() * NOTE_CHARS.length)];
+
+        const startX = (10 + Math.random() * 78).toFixed(1) + "%";
+        const drift = (Math.random() * 70 - 35).toFixed(0) + "px";
+        const spin = (Math.random() * 70 - 35).toFixed(0) + "deg";
+        const duration = (2.4 + Math.random() * 1.8).toFixed(2) + "s";
+        const size = (16 + Math.random() * 14).toFixed(0) + "px";
+        const hue = Math.floor(Math.random() * 360);
+
+        note.style.left = startX;
+        note.style.fontSize = size;
+        note.style.color = `hsl(${hue}, 90%, 60%)`;
+        note.style.textShadow = `0 0 6px hsl(${hue}, 100%, 70%), 0 0 2px rgba(0,0,0,.4)`;
+        note.style.setProperty("--drift", drift);
+        note.style.setProperty("--spin", spin);
+        note.style.animationDuration = duration;
+
+        notesLayer.appendChild(note);
+        note.addEventListener("animationend", () => note.remove(), { once: true });
+    }
+
+    function startNoteSpawner() {
+        stopNoteSpawner();
+        spawnNote();
+        noteTimer = setInterval(() => {
+            spawnNote();
+            if (Math.random() < 0.5) {
+                setTimeout(spawnNote, 200 + Math.random() * 350);
+            }
+        }, 650 + Math.random() * 550); // randomized cadence — different every play
+    }
+
+    function stopNoteSpawner() {
+        if (noteTimer) {
+            clearInterval(noteTimer);
+            noteTimer = null;
+        }
+    }
+
+    function clearNotes() {
+        notesLayer.innerHTML = "";
+    }
+
     function setEqPlaying(isPlaying) {
         songEq.classList.toggle("playing", isPlaying);
+        songArt.classList.toggle("playing", isPlaying);
+        if (isPlaying) {
+            startNoteSpawner();
+        } else {
+            stopNoteSpawner();
+        }
     }
 
     function encodePath(dir, file) {
@@ -182,8 +244,10 @@
         const song = queue[currentIndex];
         audio.src = encodePath(SONG_DIR[lang], song.file);
         albumArtImg.onerror = () => {
-            albumArtImg.onerror = null;
-            albumArtImg.src = DEFAULT_ART;
+            if (albumArtImg.src.indexOf(FALLBACK_ART) === -1) {
+                albumArtImg.onerror = () => { albumArtImg.onerror = null; };
+                albumArtImg.src = FALLBACK_ART;
+            }
         };
         albumArtImg.src = song.art || DEFAULT_ART;
         trackTitle.textContent = song.title;
@@ -255,6 +319,9 @@
         queuePanel.style.display = "none";
         playerView.style.display = "none";
         langView.style.display = "flex";
+        stopNoteSpawner();
+        clearNotes();
+        songArt.classList.remove("playing");
     }
 
 
