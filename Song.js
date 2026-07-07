@@ -84,14 +84,11 @@
         hindi: "assets/Song/Hindi/"
     };
 
-
     const DEFAULT_ART = "assets/icons/dics1.png";
     const FALLBACK_ART = "assets/icons/Song.png";
 
-
     const VOLUME_ICON_ON = "assets/icons/volume-on.png";
     const VOLUME_ICON_OFF = "assets/icons/volume-off.png";
-
 
     let lang = null;
     let queue = [];
@@ -192,7 +189,7 @@
             if (Math.random() < 0.5) {
                 setTimeout(spawnNote, 200 + Math.random() * 350);
             }
-        }, 650 + Math.random() * 550); // randomized cadence — different every play
+        }, 650 + Math.random() * 550); 
     }
 
     function stopNoteSpawner() {
@@ -323,7 +320,6 @@
         songArt.classList.remove("playing");
     }
 
-
     hindiBtn.addEventListener("click", () => startLanguage("hindi"));
     englishBtn.addEventListener("click", () => startLanguage("english"));
     changeLangBtn.addEventListener("click", backToLanguage);
@@ -385,9 +381,7 @@
         }
     });
 
-
     audio.volume = volumeSlider.value / 100;
-
 
     if (songCloseBtn) {
         songCloseBtn.addEventListener("click", () => {

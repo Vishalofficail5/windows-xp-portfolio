@@ -27,18 +27,20 @@
         const action = getSelectedAction();
         closeDialog();
 
+        if (typeof window.stopLotify === "function") {
+            window.stopLotify();
+        }
+        if (typeof window.stopArcadeGame === "function") {
+            window.stopArcadeGame();
+        }
+
         waitScreen.classList.add("shutdown-stage-active");
 
         setTimeout(() => {
             if (action === "shutdown") {
                 waitScreen.classList.remove("shutdown-stage-active");
                 finalScreen.classList.add("shutdown-stage-active");
-                // Terminal state on purpose — a real machine just sits here
-                // until you physically turn it off, so nothing else runs.
             } else {
-                // restart / MS-DOS mode / log on as a different user —
-                // reloading replays the whole Boot.js sequence, which is
-                // exactly what a restart should look like.
                 location.reload();
             }
         }, 2200);
@@ -48,10 +50,7 @@
     noBtn.addEventListener("click", closeDialog);
     xBtn.addEventListener("click", closeDialog);
     helpBtn.addEventListener("click", () => {
-        // Decorative, same as the real dialog having no help topic wired up.
     });
 
-    // Exposed so window.js's "Shut Down" menu item opens this dialog
-    // instead of instantly wiping the page.
     window.startShutdownSequence = openDialog;
 })();

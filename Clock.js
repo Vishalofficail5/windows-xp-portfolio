@@ -15,6 +15,5 @@ function updateClock() {
 
     clockTime.textContent = `${hours}:${minutes} ${ampm}`;
 }
-
 updateClock();
 setInterval(updateClock, 1000);

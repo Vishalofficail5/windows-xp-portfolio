@@ -96,7 +96,6 @@
 }
 
 /* ---- Stages 2 & 4: plain black "Starting V-OS..." ---- */
-
 .boot-stage-plain {
     background: #000;
     align-items: flex-start;

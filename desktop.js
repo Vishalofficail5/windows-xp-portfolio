@@ -7,13 +7,10 @@ homeBtn.addEventListener("click", () => {
         removeTaskbarButton(win);
     });
 
-    // The Song (Lotify) window has its own audio element that keeps
-    // playing even after the window is hidden — stop it explicitly.
     if (typeof window.stopLotify === "function") {
         window.stopLotify();
     }
 
-    // Same idea for the Arcade window's embedded game.
     if (typeof window.stopArcadeGame === "function") {
         window.stopArcadeGame();
     }

@@ -20,17 +20,15 @@
 
 <body>
 
-    <!-- BOOT SCREEN — 4 stages, see Boot.js -->
     <div id="bootScreen" class="boot-screen">
 
-        <!-- 1) Phoenix BIOS memory test -->
         <div class="boot-stage boot-stage-bios boot-stage-active" id="bootStage1">
             <div class="boot-bios-box">
                 <div>Phoenix BIOS v4.0</div>
                 <div>Memory Test...</div>
-                <!--<div>“DISClAIMER------⚠This project is a personal portfolio inspired by the classic user interface of Microsoft Windows
+                <div>“DISClAIMER------⚠This project is a personal portfolio inspired by the classic user interface of Microsoft Windows
                     98. This project is for educational and personal demonstration purposes only and is not affiliated
-                    with or endorsed by Microsoft.”</div>-->
+                    with or endorsed by Microsoft.”</div>
                 <div class="boot-bios-bar-row">
                     <div class="boot-bios-bar-outer">
                         <div class="boot-bios-bar-fill" id="bootBiosBar"></div>
@@ -42,12 +40,10 @@
             </div>
         </div>
 
-        <!-- 2) "Starting V-OS..." -->
         <div class="boot-stage boot-stage-plain" id="bootStage2">
             <div class="boot-plain-text">Starting V-OS...</div>
         </div>
 
-        <!-- 3) V-OS logo — startup sound starts here -->
         <div class="boot-stage boot-stage-logo" id="bootStage3">
             <div class="boot-logo-sky">
                 <div class="boot-logo-sky">
@@ -62,7 +58,6 @@
             </div>
         </div>
 
-        <!-- 4) Driver detection log — sound still playing -->
         <div class="boot-stage boot-stage-plain boot-stage-log" id="bootStage4">
             <pre class="boot-plain-text boot-log-text" id="bootLogText">Starting V-OS...</pre>
         </div>
@@ -70,7 +65,6 @@
         <audio id="bootSound" src="assets/sounds/win95-startup.mp3" preload="auto"></audio>
     </div>
 
-    <!-- SHUTDOWN CONFIRM DIALOG -->
     <div class="shutdown-overlay" id="shutdownOverlay">
         <div class="shutdown-dialog">
             <div class="shutdown-dialog-titlebar">
@@ -107,7 +101,6 @@
         </div>
     </div>
 
-    <!-- SHUTDOWN: sky "please wait" stage -->
     <div class="shutdown-wait-screen" id="shutdownWaitScreen">
         <div class="shutdown-wait-text" id="shutdownWaitText">Please wait while your computer<br>shuts down.</div>
         <div class="boot-wordmark">
@@ -116,7 +109,6 @@
         </div>
     </div>
 
-    <!-- SHUTDOWN: final black stage -->
     <div class="shutdown-final-screen" id="shutdownFinalScreen">
         <div class="shutdown-final-text">It's now safe to turn off<br>your computer.</div>
     </div>

@@ -148,7 +148,6 @@
 }
 
 /* ---- Stage: final black screen ---- */
-
 .shutdown-final-screen {
     position: fixed;
     inset: 0;

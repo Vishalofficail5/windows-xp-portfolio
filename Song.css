@@ -98,8 +98,6 @@
     background: #dedad2;
 }
 
-/* ---- Player screen ---- */
-
 .song-player-view {
     display: none;
     flex-direction: column;
@@ -164,9 +162,6 @@
     user-select: none;
 }
 
-/* Circular so any photo you drop in reads as a spinning disc, same as the
-   default icon. object-fit: cover means non-square photos get cropped to
-   fit rather than squashed. */
 .album-art-img {
     width: min(68%, 170px);
     aspect-ratio: 1 / 1;
@@ -320,7 +315,6 @@
     color: #454545;
 }
 
-/* seek bar */
 .song-seek-row {
     display: flex;
     align-items: center;
@@ -368,7 +362,6 @@ input[type="range"]::-moz-range-thumb {
     border-radius: 0;
 }
 
-/* controls */
 .song-controls {
     display: flex;
     align-items: center;

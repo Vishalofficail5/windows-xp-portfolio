@@ -23,7 +23,6 @@
     const backBtn = document.getElementById("arcadeBackBtn");
     const titleEl = document.getElementById("arcadeGameTitle");
     const frame = document.getElementById("arcadeFrame");
-
     const closeBtn = win.querySelector(".closeBtn");
     const minimizeBtn = win.querySelector(".minimizeBtn");
 

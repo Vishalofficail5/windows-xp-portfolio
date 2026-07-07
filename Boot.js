@@ -65,9 +65,6 @@
         const attempt = sound.play();
         if (attempt && attempt.catch) {
             attempt.catch(() => {
-                // Shouldn't happen now that playback is gated behind the
-                // press-any-key step below, but don't let a rejected
-                // promise throw an unhandled error into the console.
             });
         }
     }
