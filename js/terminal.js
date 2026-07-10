@@ -10,16 +10,16 @@
 
     const files = {
         "about.txt":
-            "Vishal — Backend Developer.\n" +
-            "Learning DSA, Java, Spring Boot, Full Stack Development.\n" +
+            "Vishal — Third Year B.Tech AI & DS\n" +
+            "Machine Learning, Deep Learning, Computer Vision, LLMs.\n" +
             "Mechanical Engineering background, pivoted into software.",
         "experience.txt":
             "Design Consultant — WIKA Instruments Pvt. Ltd.\n" +
             "Intern — Railway Coach Care Center\n" +
             "Certifications: NSIC AutoCAD, Google Cloud Generative AI",
         "projects.txt":
-            "Library Management System — Java / MySQL\n" +
-            "Weather App — JavaScript / public API\n" +
+            "GitHub Practice Tracker — In Development.\n" +
+            "Weather App — In Development.\n" +
             "Roadscapes-VLM-Comparison — benchmarking Phi-3, Qwen2-VL, LLaVA, PaliGemma\n" +
             "  on road scene QA under day/night conditions",
         "contact.txt":
