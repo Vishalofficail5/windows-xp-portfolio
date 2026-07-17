@@ -134,7 +134,7 @@
   <h1>DEAD MANSION</h1>
   <h2>THEY DON'T STOP COMING</h2>
   <p>You're trapped inside a cramped old mansion — ground floor, two upper floors and an attic — and the dead have gotten in. There is no escape, only survival. Kill zombies for points, aim for the head for bonus points. Find medkits scattered through the house to stay alive.</p>
-  <p><span class="keys">WASD</span> move &nbsp;|&nbsp; <span class="keys">MOUSE</span> look &nbsp;|&nbsp; <span class="keys">CLICK</span> shoot &nbsp;|&nbsp; <span class="keys">E</span> go upstairs &nbsp;|&nbsp; <span class="keys">Q</span> go downstairs</p>
+  <p><span class="keys">WASD</span> move &nbsp;|&nbsp; <span class="keys">SHIFT</span> sprint &nbsp;|&nbsp; <span class="keys">MOUSE</span> look &nbsp;|&nbsp; <span class="keys">CLICK</span> shoot &nbsp;|&nbsp; <span class="keys">E</span> go upstairs &nbsp;|&nbsp; <span class="keys">Q</span> go downstairs</p>
   <button class="playBtn" id="playBtn">Enter the Mansion</button>
 </div>
 
@@ -177,19 +177,26 @@ const FLOOR_BASE = [0, FLOOR_HEIGHT, FLOOR_HEIGHT*2, FLOOR_HEIGHT*3];
 const FLOOR_NAMES = ["GROUND FLOOR","SECOND FLOOR","THIRD FLOOR","ATTIC"];
 const EYE_HEIGHT = 1.65;
 const STAIR_ZONE = {minX:6.6,maxX:9.4,minZ:6.6,maxZ:9.4};
-const BUILD_MIN = -10, BUILD_MAX = 10;
+const MANSION_HALF = 15;
+const BUILD_MIN = -MANSION_HALF, BUILD_MAX = MANSION_HALF;
 const PLAYER_RADIUS = 0.35;
 const ZOMBIE_RADIUS = 0.4;
 
 /* ===================== BASIC SETUP ===================== */
 const canvas = document.getElementById('gameCanvas');
-const renderer = new THREE.WebGLRenderer({canvas:canvas, antialias:false, powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio,1));
+const renderer = new THREE.WebGLRenderer({canvas:canvas, antialias:true, powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = false;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+if(renderer.outputColorSpace!==undefined) renderer.outputColorSpace = THREE.SRGBColorSpace;
+else if(renderer.outputEncoding!==undefined) renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.98;
 
 const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0x030202, 0.065);
+scene.background = new THREE.Color(0x07060b);
+scene.fog = new THREE.FogExp2(0x09070b, 0.045);
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.05, 45);
 
@@ -199,19 +206,31 @@ pitchObject.add(camera);
 const yawObject = new THREE.Object3D();
 yawObject.add(pitchObject);
 yawObject.position.set(0, FLOOR_BASE[0]+EYE_HEIGHT, -6);
+yawObject.rotation.y = Math.PI;
 scene.add(yawObject);
 
 // flashlight attached to camera
-const flashlight = new THREE.SpotLight(0xfff0d0, 1.6, 16, Math.PI/6.2, 0.5, 1.4);
+const flashlight = new THREE.SpotLight(0xffe0bd, 1.35, 15, Math.PI/7.2, 0.68, 1.6);
 flashlight.position.set(0,0,0.2);
 camera.add(flashlight);
 flashlight.target.position.set(0,0,-1);
 camera.add(flashlight.target);
 
-const ambient = new THREE.AmbientLight(0x1c2230, 0.55);
+const ambient = new THREE.AmbientLight(0x202333, 0.24);
 scene.add(ambient);
-const hemi = new THREE.HemisphereLight(0x33394a, 0x0a0806, 0.25);
+const hemi = new THREE.HemisphereLight(0x45506c, 0x100907, 0.32);
 scene.add(hemi);
+const moonLight = new THREE.DirectionalLight(0x7a91c7, 0.3);
+moonLight.position.set(-7, 11, -5);
+moonLight.castShadow = true;
+moonLight.shadow.mapSize.set(1024,1024);
+moonLight.shadow.camera.left = -12;
+moonLight.shadow.camera.right = 12;
+moonLight.shadow.camera.top = 12;
+moonLight.shadow.camera.bottom = -12;
+moonLight.shadow.camera.near = 1;
+moonLight.shadow.camera.far = 32;
+scene.add(moonLight);
 
 window.addEventListener('resize', ()=>{
   camera.aspect = window.innerWidth/window.innerHeight;
@@ -220,8 +239,20 @@ window.addEventListener('resize', ()=>{
 });
 
 /* ===================== AUDIO (synth, no external files) ===================== */
-let actx = null;
+let actx = null, ambienceOsc = null, ambienceGain = null, footstepTimer = 0;
 function ensureAudio(){ if(!actx){ actx = new (window.AudioContext||window.webkitAudioContext)(); } }
+function startAmbience(){
+  ensureAudio();
+  if(ambienceOsc) return;
+  ambienceOsc = actx.createOscillator(); ambienceOsc.type = 'sine'; ambienceOsc.frequency.value = 43;
+  ambienceGain = actx.createGain(); ambienceGain.gain.value = 0.018;
+  const filter = actx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 180;
+  ambienceOsc.connect(filter); filter.connect(ambienceGain); ambienceGain.connect(actx.destination);
+  ambienceOsc.start();
+}
+function stopAmbience(){
+  if(ambienceOsc){ ambienceOsc.stop(); ambienceOsc=null; ambienceGain=null; }
+}
 function beep(freq, dur, type, gainVal, slideTo){
   if(!actx) return;
   const t0 = actx.currentTime;
@@ -246,22 +277,25 @@ function noiseBurst(dur, gainVal){
   gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+dur);
   src.connect(gain); gain.connect(actx.destination); src.start();
 }
-function sfxShoot(){ noiseBurst(0.12,0.5); beep(180,0.1,'square',0.25,60); }
+function sfxShoot(){ noiseBurst(0.09,0.44); beep(135,0.07,'square',0.2,55); beep(720,0.035,'triangle',0.08,320); }
 function sfxZombieHit(){ beep(90,0.18,'sawtooth',0.3,40); }
 function sfxHeadshot(){ beep(700,0.09,'square',0.25,1400); beep(90,0.18,'sawtooth',0.25,40); }
 function sfxPlayerHurt(){ noiseBurst(0.25,0.35); beep(120,0.3,'sawtooth',0.3,50); }
 function sfxPickup(){ beep(440,0.09,'sine',0.25,880); beep(660,0.12,'sine',0.2,990); }
 function sfxGameOver(){ beep(220,0.6,'sawtooth',0.3,40); }
 function sfxStairs(){ beep(300,0.1,'sine',0.15,220); }
+function sfxFootstep(){ noiseBurst(0.04,0.055); beep(72,0.035,'triangle',0.035,58); }
+function sfxZombieGrowl(){ beep(68+Math.random()*20,0.26,'sawtooth',0.07,36); }
 
-/* ===================== MATERIALS (Lambert = much cheaper to shade than Standard) ===================== */
-const wallMat = new THREE.MeshLambertMaterial({color:0x3a3228});
-const wallMat2 = new THREE.MeshLambertMaterial({color:0x342c24});
-const floorMat = new THREE.MeshLambertMaterial({color:0x24201a});
-const ceilMat = new THREE.MeshLambertMaterial({color:0x181410});
-const furnMat = new THREE.MeshLambertMaterial({color:0x2e2418});
-const stairMat = new THREE.MeshLambertMaterial({color:0x4a3a26});
-const railMat = new THREE.MeshLambertMaterial({color:0x1a1512});
+/* ===================== MATERIALS ===================== */
+const wallMat = new THREE.MeshStandardMaterial({color:0x3a3228, roughness:0.92, metalness:0.03});
+const wallMat2 = new THREE.MeshStandardMaterial({color:0x342c24, roughness:0.94, metalness:0.02});
+const floorMat = new THREE.MeshStandardMaterial({color:0x24201a, roughness:0.78, metalness:0.08});
+const ceilMat = new THREE.MeshStandardMaterial({color:0x181410, roughness:1});
+const furnMat = new THREE.MeshStandardMaterial({color:0x2e2418, roughness:0.7, metalness:0.12});
+const stairMat = new THREE.MeshStandardMaterial({color:0x4a3a26, roughness:0.72, metalness:0.12});
+const railMat = new THREE.MeshStandardMaterial({color:0x1a1512, roughness:0.45, metalness:0.55});
+const windowMat = new THREE.MeshStandardMaterial({color:0x1d324f, emissive:0x061426, emissiveIntensity:0.8, roughness:0.18, metalness:0.45});
 
 /* Merge many small box geometries into one BufferGeometry per floor/material so the
    GPU gets a handful of draw calls per floor instead of dozens. Rotation isn't needed
@@ -313,32 +347,74 @@ function addBox(floorIdx, x,z,w,d,h, bucket, yOffset){
 function flushFloor(floorIdx){
   const b = geomBuckets[floorIdx];
   const wallMaterial = floorIdx % 2 === 0 ? wallMat : wallMat2;
-  if(b.wall.length){ floorGroups[floorIdx].add(new THREE.Mesh(mergeGeoms(b.wall), wallMaterial)); }
-  if(b.furn.length){ floorGroups[floorIdx].add(new THREE.Mesh(mergeGeoms(b.furn), furnMat)); }
-  if(b.stair.length){ floorGroups[floorIdx].add(new THREE.Mesh(mergeGeoms(b.stair), stairMat)); }
+  if(b.wall.length){
+    const mesh = new THREE.Mesh(mergeGeoms(b.wall), wallMaterial);
+    mesh.castShadow = true; mesh.receiveShadow = true;
+    floorGroups[floorIdx].add(mesh);
+  }
+  if(b.furn.length){
+    const mesh = new THREE.Mesh(mergeGeoms(b.furn), furnMat);
+    mesh.castShadow = true; mesh.receiveShadow = true;
+    floorGroups[floorIdx].add(mesh);
+  }
+  if(b.stair.length){
+    const mesh = new THREE.Mesh(mergeGeoms(b.stair), stairMat);
+    mesh.castShadow = true; mesh.receiveShadow = true;
+    floorGroups[floorIdx].add(mesh);
+  }
 }
 
 function buildFlatFloorPlane(floorIdx, height){
-  const floorGeo = new THREE.PlaneGeometry(20,20);
+  const floorGeo = new THREE.PlaneGeometry(MANSION_HALF*2,MANSION_HALF*2);
   const floorMesh = new THREE.Mesh(floorGeo, floorMat);
   floorMesh.rotation.x = -Math.PI/2;
   floorMesh.position.set(0,0.01,0);
+  floorMesh.receiveShadow = true;
   floorGroups[floorIdx].add(floorMesh);
 
-  const ceilGeo = new THREE.PlaneGeometry(20,20);
+  const ceilGeo = new THREE.PlaneGeometry(MANSION_HALF*2,MANSION_HALF*2);
   const ceilMesh = new THREE.Mesh(ceilGeo, ceilMat);
   ceilMesh.rotation.x = Math.PI/2;
   ceilMesh.position.set(0,height-0.02,0);
+  ceilMesh.receiveShadow = true;
   floorGroups[floorIdx].add(ceilMesh);
+}
+
+function addWindow(floorIdx, x, z, rotation){
+  const group = new THREE.Group();
+  group.position.set(x,0,z);
+  group.rotation.y = rotation || 0;
+  const pane = new THREE.Mesh(new THREE.BoxGeometry(2.15,1.35,0.08), windowMat);
+  pane.position.y = 1.95;
+  const vertical = new THREE.Mesh(new THREE.BoxGeometry(0.07,1.55,0.12), railMat);
+  vertical.position.y = 1.95;
+  const horizontal = new THREE.Mesh(new THREE.BoxGeometry(2.35,0.07,0.12), railMat);
+  horizontal.position.y = 1.95;
+  const sill = new THREE.Mesh(new THREE.BoxGeometry(2.4,0.12,0.22), stairMat);
+  sill.position.y = 1.15;
+  group.add(pane, vertical, horizontal, sill);
+  group.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.receiveShadow=true; } });
+  floorGroups[floorIdx].add(group);
+}
+
+function decorateFloor(floorIdx){
+  [-9,-3,3,9].forEach(x=>{
+    addWindow(floorIdx,x,-MANSION_HALF+0.18,0);
+    addWindow(floorIdx,x,MANSION_HALF-0.18,0);
+  });
+  [-9,-3,3,9].forEach(z=>{
+    addWindow(floorIdx,-MANSION_HALF+0.18,z,Math.PI/2);
+    addWindow(floorIdx,MANSION_HALF-0.18,z,Math.PI/2);
+  });
 }
 
 function buildStandardFloor(floorIdx, height){
   buildFlatFloorPlane(floorIdx, height);
   // perimeter
-  addWallSeg(floorIdx, -10,-10, 10,-10, height);
-  addWallSeg(floorIdx, -10, 10, 10, 10, height);
-  addWallSeg(floorIdx, -10,-10,-10, 10, height);
-  addWallSeg(floorIdx,  10,-10, 10, 10, height);
+  addWallSeg(floorIdx, -15,-15, 15,-15, height);
+  addWallSeg(floorIdx, -15, 15, 15, 15, height);
+  addWallSeg(floorIdx, -15,-15,-15, 15, height);
+  addWallSeg(floorIdx,  15,-15, 15, 15, height);
   // left corridor wall (x=-1) with door gaps
   addWallSeg(floorIdx, -1,-10, -1,-6, height);
   addWallSeg(floorIdx, -1,-4, -1, 0, height);
@@ -364,6 +440,7 @@ function buildStandardFloor(floorIdx, height){
   addBox(floorIdx, 5,-0.5, 1.3,1.3,1.4, 'furn'); // roomR2 cabinet
   addBox(floorIdx, 4,6.5, 2,1,0.9, 'furn'); // roomR3
 
+  decorateFloor(floorIdx);
   // small flicker light per floor (kept to one for performance)
   addFlickerLight(floorIdx, 0,height-0.6, 2, 0xffb060);
 
@@ -373,10 +450,10 @@ function buildStandardFloor(floorIdx, height){
 
 function buildAttic(floorIdx, height){
   buildFlatFloorPlane(floorIdx, height);
-  addWallSeg(floorIdx, -10,-10, 10,-10, height);
-  addWallSeg(floorIdx, -10, 10, 10, 10, height);
-  addWallSeg(floorIdx, -10,-10,-10, 10, height);
-  addWallSeg(floorIdx,  10,-10, 10, 10, height);
+  addWallSeg(floorIdx, -15,-15, 15,-15, height);
+  addWallSeg(floorIdx, -15, 15, 15, 15, height);
+  addWallSeg(floorIdx, -15,-15,-15, 15, height);
+  addWallSeg(floorIdx,  15,-15, 15, 15, height);
   // a couple partial partitions, open loft feel
   addWallSeg(floorIdx, -10,-2, -3,-2, height);
   addWallSeg(floorIdx, 3,2, 10,2, height);
@@ -387,18 +464,27 @@ function buildAttic(floorIdx, height){
   addBox(floorIdx, 2,6, 1.2,1.2,0.8, 'furn');
   // roof beams (decorative, above head height, no collider)
   for(let bz=-9; bz<=9; bz+=4.5){
-    bakeGeom(floorIdx, 'stair', new THREE.BoxGeometry(20,0.25,0.3), 0, height-0.35, bz);
+    bakeGeom(floorIdx, 'stair', new THREE.BoxGeometry(MANSION_HALF*2,0.25,0.3), 0, height-0.35, bz);
   }
+  decorateFloor(floorIdx);
   addFlickerLight(floorIdx, 0,height-0.6,0, 0xffcf90);
   buildStairsMesh(floorIdx, height, true);
   flushFloor(floorIdx);
 }
 
 function addFlickerLight(floorIdx, x,y,z, color){
-  const light = new THREE.PointLight(color, 1.1, 9, 2);
+  const fixture = new THREE.Group();
+  const housing = new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.24,0.16,8), railMat);
+  const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.12,10,8), new THREE.MeshBasicMaterial({color}));
+  housing.position.y = y+0.04;
+  bulb.position.y = y-0.08;
+  fixture.position.set(x,0,z);
+  fixture.add(housing, bulb);
+  floorGroups[floorIdx].add(fixture);
+  const light = new THREE.PointLight(color, 1.45, 10, 2);
   light.position.set(x,y,z);
   floorGroups[floorIdx].add(light);
-  light.userData.baseIntensity = 1.1 + Math.random()*0.3;
+  light.userData.baseIntensity = 1.45 + Math.random()*0.3;
   light.userData.flickerSeed = Math.random()*100;
   flickerLights.push(light);
 }
@@ -471,12 +557,18 @@ const SPAWN_ZONES_STD = [
   {x1:2,z1:-9,x2:9,z2:-6},
   {x1:2,z1:-4,x2:9,z2:3},
   {x1:2,z1:5,x2:5.8,z2:9},
+  {x1:-14,z1:-14,x2:-11,z2:14},
+  {x1:11,z1:-14,x2:14,z2:14},
+  {x1:-10,z1:11,x2:10,z2:14},
+  {x1:-10,z1:-14,x2:10,z2:-11},
 ];
 const SPAWN_ZONES_ATTIC = [
   {x1:-9,z1:-9,x2:-3,z2:-2.2},
   {x1:-9,z1:-1,x2:9,z2:1.6},
   {x1:3,z1:2.4,x2:9,z2:9},
   {x1:-9,z1:2.4,x2:2.6,z2:9},
+  {x1:-14,z1:-14,x2:-10,z2:14},
+  {x1:10,z1:-14,x2:14,z2:14},
 ];
 function getZonesForFloor(f){ return f===3 ? SPAWN_ZONES_ATTIC : SPAWN_ZONES_STD; }
 function randomPointInFloor(f){
@@ -545,11 +637,31 @@ document.addEventListener('mousemove', e=>{
 
 /* ===================== VIEW MODEL GUN ===================== */
 const gunGroup = new THREE.Group();
-const gunBody = new THREE.Mesh(new THREE.BoxGeometry(0.09,0.09,0.32), new THREE.MeshLambertMaterial({color:0x1a1a1a}));
-gunBody.position.set(0.16,-0.14,-0.32);
-const gunGrip = new THREE.Mesh(new THREE.BoxGeometry(0.07,0.14,0.06), new THREE.MeshLambertMaterial({color:0x111111}));
-gunGrip.position.set(0.16,-0.23,-0.24);
-gunGroup.add(gunBody, gunGrip);
+const gunMetalMat = new THREE.MeshStandardMaterial({color:0x101316, roughness:0.38, metalness:0.8});
+const gunWoodMat = new THREE.MeshStandardMaterial({color:0x4e1f12, roughness:0.52, metalness:0.04});
+const gunDarkMat = new THREE.MeshStandardMaterial({color:0x060708, roughness:0.62, metalness:0.55});
+function addGunPart(geometry, material, x, y, z, rotation){
+  const part = new THREE.Mesh(geometry, material);
+  part.position.set(x,y,z);
+  if(rotation) part.rotation.set(rotation[0]||0,rotation[1]||0,rotation[2]||0);
+  gunGroup.add(part);
+  return part;
+}
+addGunPart(new THREE.BoxGeometry(0.13,0.13,0.42), gunMetalMat, 0.24,-0.25,-0.64);
+addGunPart(new THREE.BoxGeometry(0.14,0.06,0.33), gunDarkMat, 0.24,-0.17,-0.64);
+addGunPart(new THREE.BoxGeometry(0.12,0.11,0.28), gunWoodMat, 0.24,-0.23,-0.95);
+addGunPart(new THREE.CylinderGeometry(0.026,0.026,0.57,8), gunMetalMat, 0.24,-0.19,-1.24, [Math.PI/2,0,0]);
+addGunPart(new THREE.CylinderGeometry(0.045,0.04,0.12,8), gunDarkMat, 0.24,-0.19,-1.54, [Math.PI/2,0,0]);
+addGunPart(new THREE.CylinderGeometry(0.015,0.015,0.42,8), gunMetalMat, 0.24,-0.1,-1.15, [Math.PI/2,0,0]);
+addGunPart(new THREE.BoxGeometry(0.16,0.14,0.34), gunWoodMat, 0.24,-0.25,-0.29, [0.12,0,0]);
+addGunPart(new THREE.BoxGeometry(0.09,0.2,0.08), gunWoodMat, 0.24,-0.41,-0.53, [-0.28,0,0]);
+addGunPart(new THREE.TorusGeometry(0.125,0.042,6,16,Math.PI*0.78), gunDarkMat, 0.24,-0.42,-0.72, [0,Math.PI/2,-0.32]);
+addGunPart(new THREE.BoxGeometry(0.09,0.09,0.05), gunMetalMat, 0.24,-0.08,-1.38);
+addGunPart(new THREE.BoxGeometry(0.08,0.06,0.06), gunMetalMat, 0.24,-0.08,-0.48);
+const gunMuzzle = addGunPart(new THREE.ConeGeometry(0.07,0.25,8), new THREE.MeshBasicMaterial({color:0xffc35a}), 0.24,-0.19,-1.62, [-Math.PI/2,0,0]);
+gunMuzzle.visible = false;
+gunGroup.scale.setScalar(0.78);
+gunGroup.rotation.z = -0.08;
 camera.add(gunGroup);
 let gunRecoil = 0;
 
@@ -557,8 +669,13 @@ let gunRecoil = 0;
 /* Body parts (torso/arms/legs) are merged into a single mesh - only the head stays
    separate, since it needs its own identity for headshot detection. This cuts each
    zombie from 6 draw calls down to 2. */
-const zombieBodyMat = new THREE.MeshLambertMaterial({color:0x384f2c});
-const zombieSkinMat = new THREE.MeshLambertMaterial({color:0x4a6b3a});
+const zombieBodyMat = new THREE.MeshStandardMaterial({color:0x384f2c, roughness:0.9, metalness:0.02});
+const zombieSkinTones = [0x5c7b49,0x72855a,0x7d6952,0x536a45];
+const zombieClothingTones = [0x334039,0x3b3033,0x4b4333,0x28383e];
+const zombieEyeMat = new THREE.MeshBasicMaterial({color:0xffc34d});
+const zombieSocketMat = new THREE.MeshBasicMaterial({color:0x120d0c});
+const zombieMouthMat = new THREE.MeshBasicMaterial({color:0x210b0a});
+const zombieHeadGeo = new THREE.SphereGeometry(0.27,12,9);
 const zombieBodyGeo = mergeGeoms([
   new THREE.BoxGeometry(0.55,0.8,0.32).translate(0,1.0,0),      // torso
   new THREE.BoxGeometry(0.16,0.65,0.16).translate(-0.38,1.05,0), // armL
@@ -570,15 +687,79 @@ const zombies = [];
 function createZombieMesh(){
   const group = new THREE.Group();
   const body = new THREE.Mesh(zombieBodyGeo, zombieBodyMat);
+  body.castShadow = true;
+  body.receiveShadow = true;
   group.add(body);
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.22,8,6), zombieSkinMat);
+  const human = new THREE.Group();
+  const clothMat = new THREE.MeshStandardMaterial({
+    color:zombieClothingTones[Math.floor(Math.random()*zombieClothingTones.length)], roughness:0.95, metalness:0
+  });
+  const chest = new THREE.Mesh(new THREE.SphereGeometry(0.34,10,8), clothMat);
+  chest.scale.set(0.9,1.45,0.62);
+  chest.position.y = 1.02;
+  human.add(chest);
+  const arms = [], legs = [];
+  for(const side of [-1,1]){
+    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.095,0.12,0.72,8), clothMat);
+    arm.position.set(side*0.39,1.07,0);
+    arm.rotation.z = side*0.22;
+    human.add(arm);
+    arms.push(arm);
+    const hand = new THREE.Mesh(new THREE.SphereGeometry(0.11,8,6), new THREE.MeshStandardMaterial({color:zombieSkinTones[Math.floor(Math.random()*zombieSkinTones.length)], roughness:0.98}));
+    hand.position.set(side*0.52,0.72,-0.02);
+    human.add(hand);
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.14,0.78,8), new THREE.MeshStandardMaterial({color:0x25272a, roughness:0.9}));
+    leg.position.set(side*0.16,0.38,0);
+    human.add(leg);
+    legs.push(leg);
+  }
+  human.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.receiveShadow=true; } });
+  group.add(human);
+  const skinMat = new THREE.MeshStandardMaterial({
+    color:zombieSkinTones[Math.floor(Math.random()*zombieSkinTones.length)], roughness:0.96, metalness:0
+  });
+  const head = new THREE.Mesh(zombieHeadGeo, skinMat);
   head.position.y = 1.55;
+  head.castShadow = true;
+  head.receiveShadow = true;
   group.add(head);
-  return { group, head, body };
+
+  const face = new THREE.Group();
+  const eyes = [];
+  for(const side of [-1,1]){
+    const socket = new THREE.Mesh(new THREE.SphereGeometry(0.065,8,6), zombieSocketMat);
+    socket.scale.set(1,0.72,0.24);
+    socket.position.set(side*0.1,0.045,-0.254);
+    face.add(socket);
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.028,8,6), zombieEyeMat);
+    eye.scale.z = 0.3;
+    eye.position.set(side*0.1,0.045,-0.273);
+    face.add(eye);
+    eyes.push(eye);
+
+    const brow = new THREE.Mesh(new THREE.BoxGeometry(0.12,0.027,0.025), skinMat);
+    brow.position.set(side*0.1,0.12,-0.246);
+    brow.rotation.z = side*0.16;
+    face.add(brow);
+  }
+  const nose = new THREE.Mesh(new THREE.SphereGeometry(0.045,8,6), skinMat);
+  nose.scale.set(0.72,1.1,0.32);
+  nose.position.set(0,-0.005,-0.268);
+  face.add(nose);
+  const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.15,0.036,0.02), zombieMouthMat);
+  mouth.position.set(0,-0.105,-0.257);
+  mouth.rotation.z = -0.06;
+  face.add(mouth);
+  const scar = new THREE.Mesh(new THREE.BoxGeometry(0.02,0.11,0.018), zombieMouthMat);
+  scar.position.set(-0.16,-0.035,-0.25);
+  scar.rotation.z = -0.4;
+  face.add(scar);
+  head.add(face);
+  return { group, head, body, face, eyes, human, arms, legs };
 }
 
 function spawnZombie(){
-  if(zombies.length >= 10) return;
+  if(zombies.length >= 16) return;
   // 60% chance same floor as player, else random other floor
   let floor = player.floor;
   if(Math.random() > 0.6){ floor = Math.floor(Math.random()*(TOP_FLOOR+1)); }
@@ -595,12 +776,13 @@ function spawnZombie(){
     parts, floor,
     x: pt.x, z: pt.z,
     health:100,
-    speed: 1.5 + Math.random()*1.0,
+    speed: 1.9 + Math.random()*1.15,
     attackCooldown:0,
     walkPhase: Math.random()*10,
     alive:true,
   };
   zombies.push(z);
+  if(gameState==='playing') sfxZombieGrowl();
 }
 
 function dist2(x1,z1,x2,z2){ const dx=x1-x2, dz=z1-z2; return dx*dx+dz*dz; }
@@ -648,7 +830,7 @@ const raycaster = new THREE.Raycaster();
 let shootCooldown = 0;
 function shoot(){
   if(gameState!=='playing' || shootCooldown>0) return;
-  shootCooldown = 0.32;
+  shootCooldown = 0.2;
   gunRecoil = 1;
   sfxShoot();
 
@@ -736,6 +918,7 @@ function healPlayer(amount){
 function endGame(){
   gameState = 'gameover';
   player.alive = false;
+  stopAmbience();
   sfxGameOver();
   document.exitPointerLock();
   document.getElementById('finalScore').textContent = player.score;
@@ -748,7 +931,7 @@ function endGame(){
 /* ===================== SPAWNING TIMER ===================== */
 let spawnTimer = 2.5;
 function getSpawnInterval(){
-  return Math.max(1.1, 4.2 - player.survivalTime*0.018);
+  return Math.max(0.75, 3.1 - player.survivalTime*0.015);
 }
 
 /* ===================== GAME LOOP ===================== */
@@ -762,8 +945,10 @@ function animate(){
 
   // gun recoil ease
   if(gunRecoil>0){ gunRecoil = Math.max(0, gunRecoil-delta*6); }
-  gunGroup.position.z = -gunRecoil*0.06;
-  gunGroup.position.y = -gunRecoil*0.02;
+  gunGroup.position.z = -0.18-gunRecoil*0.06;
+  gunGroup.position.y = -0.13-gunRecoil*0.02;
+  gunGroup.rotation.x = gunRecoil*0.045;
+  gunMuzzle.visible = shootCooldown > 0.24;
 
   // flicker lights
   for(const l of flickerLights){
@@ -791,7 +976,8 @@ function animate(){
 }
 
 function updatePlayerMovement(delta){
-  const speed = 4.6;
+  const sprinting = keys['ShiftLeft'] || keys['ShiftRight'];
+  const speed = sprinting ? 6.4 : 4.6;
   let mx=0, mz=0;
   if(keys['KeyW']) mz -= 1;
   if(keys['KeyS']) mz += 1;
@@ -808,7 +994,12 @@ function updatePlayerMovement(delta){
     pos.z += worldZ * speed * delta;
     resolveCollisions(pos, collidersByFloor[player.floor], PLAYER_RADIUS);
     // gun bob
-    gunGroup.position.x = 0.0 + Math.sin(now_bob())*0.004;
+    gunGroup.position.x = 0.12 + Math.sin(now_bob())*0.004;
+    footstepTimer -= delta;
+    if(footstepTimer<=0){
+      sfxFootstep();
+      footstepTimer = sprinting ? 0.25 : 0.36;
+    }
   }
 }
 let bobT = 0;
@@ -862,7 +1053,7 @@ function updateZombies(delta){
       if(d < 1.3){
         z.attackCooldown -= delta;
         if(z.attackCooldown <= 0){
-          damagePlayer(20);
+          damagePlayer(12);
           z.attackCooldown = 1.0;
         }
       }
@@ -890,13 +1081,23 @@ function updateZombies(delta){
     z.parts.group.rotation.y = Math.atan2(dxp, dzp);
     // lurch animation (whole body sways since limbs are merged into one mesh now)
     z.parts.body.rotation.z = Math.sin(z.walkPhase)*0.12;
+    z.parts.human.rotation.z = Math.sin(z.walkPhase)*0.09;
+    z.parts.arms.forEach((arm,index)=>{ arm.rotation.x = Math.sin(z.walkPhase+(index?Math.PI:0))*0.55; });
+    z.parts.legs.forEach((leg,index)=>{ leg.rotation.x = Math.sin(z.walkPhase+(index?Math.PI:0))*0.38; });
     z.parts.head.position.y = 1.55 + Math.sin(z.walkPhase*2)*0.02;
+    z.parts.head.rotation.z = Math.sin(z.walkPhase*1.5)*0.055;
+    z.parts.eyes.forEach((eye,index)=>{
+      const pulse = 0.88 + Math.sin(z.walkPhase*2.3+index)*0.12;
+      eye.scale.x = pulse;
+      eye.scale.y = pulse;
+    });
   }
 }
 
 /* ===================== UI WIRING ===================== */
 document.getElementById('playBtn').addEventListener('click', ()=>{
   ensureAudio();
+  startAmbience();
   document.getElementById('startOverlay').style.display = 'none';
   gameState = 'playing';
   updateHUD();
@@ -906,6 +1107,7 @@ document.getElementById('playBtn').addEventListener('click', ()=>{
 document.getElementById('resumeBtn').addEventListener('click', ()=>{
   document.getElementById('pausedOverlay').style.display = 'none';
   gameState = 'playing';
+  startAmbience();
   canvas.requestPointerLock();
 });
 document.getElementById('restartBtn').addEventListener('click', ()=>{
