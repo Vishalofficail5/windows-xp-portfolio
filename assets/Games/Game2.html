@@ -184,11 +184,10 @@ const ZOMBIE_RADIUS = 0.4;
 
 /* ===================== BASIC SETUP ===================== */
 const canvas = document.getElementById('gameCanvas');
-const renderer = new THREE.WebGLRenderer({canvas:canvas, antialias:true, powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
+const renderer = new THREE.WebGLRenderer({canvas:canvas, antialias:false, powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,1));
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.enabled = false;
 if(renderer.outputColorSpace!==undefined) renderer.outputColorSpace = THREE.SRGBColorSpace;
 else if(renderer.outputEncoding!==undefined) renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -222,14 +221,7 @@ const hemi = new THREE.HemisphereLight(0x45506c, 0x100907, 0.32);
 scene.add(hemi);
 const moonLight = new THREE.DirectionalLight(0x7a91c7, 0.3);
 moonLight.position.set(-7, 11, -5);
-moonLight.castShadow = true;
-moonLight.shadow.mapSize.set(1024,1024);
-moonLight.shadow.camera.left = -12;
-moonLight.shadow.camera.right = 12;
-moonLight.shadow.camera.top = 12;
-moonLight.shadow.camera.bottom = -12;
-moonLight.shadow.camera.near = 1;
-moonLight.shadow.camera.far = 32;
+moonLight.castShadow = false;
 scene.add(moonLight);
 
 window.addEventListener('resize', ()=>{
@@ -393,16 +385,16 @@ function addWindow(floorIdx, x, z, rotation){
   const sill = new THREE.Mesh(new THREE.BoxGeometry(2.4,0.12,0.22), stairMat);
   sill.position.y = 1.15;
   group.add(pane, vertical, horizontal, sill);
-  group.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.receiveShadow=true; } });
+  group.traverse(o=>{ if(o.isMesh){ o.castShadow=false; o.receiveShadow=false; } });
   floorGroups[floorIdx].add(group);
 }
 
 function decorateFloor(floorIdx){
-  [-9,-3,3,9].forEach(x=>{
+  [-8,0,8].forEach(x=>{
     addWindow(floorIdx,x,-MANSION_HALF+0.18,0);
     addWindow(floorIdx,x,MANSION_HALF-0.18,0);
   });
-  [-9,-3,3,9].forEach(z=>{
+  [-8,8].forEach(z=>{
     addWindow(floorIdx,-MANSION_HALF+0.18,z,Math.PI/2);
     addWindow(floorIdx,MANSION_HALF-0.18,z,Math.PI/2);
   });
@@ -687,8 +679,8 @@ const zombies = [];
 function createZombieMesh(){
   const group = new THREE.Group();
   const body = new THREE.Mesh(zombieBodyGeo, zombieBodyMat);
-  body.castShadow = true;
-  body.receiveShadow = true;
+  body.castShadow = false;
+  body.receiveShadow = false;
   group.add(body);
   const human = new THREE.Group();
   const clothMat = new THREE.MeshStandardMaterial({
@@ -713,15 +705,15 @@ function createZombieMesh(){
     human.add(leg);
     legs.push(leg);
   }
-  human.traverse(o=>{ if(o.isMesh){ o.castShadow=true; o.receiveShadow=true; } });
+  human.traverse(o=>{ if(o.isMesh){ o.castShadow=false; o.receiveShadow=false; } });
   group.add(human);
   const skinMat = new THREE.MeshStandardMaterial({
     color:zombieSkinTones[Math.floor(Math.random()*zombieSkinTones.length)], roughness:0.96, metalness:0
   });
   const head = new THREE.Mesh(zombieHeadGeo, skinMat);
   head.position.y = 1.55;
-  head.castShadow = true;
-  head.receiveShadow = true;
+  head.castShadow = false;
+  head.receiveShadow = false;
   group.add(head);
 
   const face = new THREE.Group();
@@ -759,7 +751,7 @@ function createZombieMesh(){
 }
 
 function spawnZombie(){
-  if(zombies.length >= 16) return;
+  if(zombies.length >= 12) return;
   // 60% chance same floor as player, else random other floor
   let floor = player.floor;
   if(Math.random() > 0.6){ floor = Math.floor(Math.random()*(TOP_FLOOR+1)); }

@@ -158,10 +158,9 @@ const Audio1 = (function(){
    2. THREE.JS SETUP (low internal resolution -> pixelated upscale)
    --------------------------------------------------------------------- */
 const canvas = document.getElementById("gameCanvas");
-const renderer = new THREE.WebGLRenderer({canvas, antialias:true, powerPreference:"high-performance"});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const renderer = new THREE.WebGLRenderer({canvas, antialias:false, powerPreference:"high-performance"});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 1.25));
+renderer.shadowMap.enabled = false;
 if(renderer.outputColorSpace!==undefined) renderer.outputColorSpace = THREE.SRGBColorSpace;
 else if(renderer.outputEncoding!==undefined) renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -187,13 +186,7 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 0.28);
 scene.add(ambientLight);
 const sunLight = new THREE.DirectionalLight(0xffffff, 1.35);
 sunLight.position.set(-14, 22, 10);
-sunLight.castShadow = true;
-sunLight.shadow.mapSize.set(1536, 1536);
-sunLight.shadow.camera.left = -20; sunLight.shadow.camera.right = 20;
-sunLight.shadow.camera.top = 20; sunLight.shadow.camera.bottom = -20;
-sunLight.shadow.camera.near = 1; sunLight.shadow.camera.far = 55;
-sunLight.shadow.bias = -0.0015;
-sunLight.shadow.radius = 3;
+sunLight.castShadow = false;
 scene.add(sunLight);
 sunLight.target.position.set(0,0,-10);
 scene.add(sunLight.target);
@@ -360,9 +353,7 @@ function lampDeco(side){
   const grp = new THREE.Group();
   const pole = new THREE.Mesh(geo.cyl, mat(0x222222)); pole.scale.set(0.25,5,0.25); pole.position.y=2.5;
   const bulb = new THREE.Mesh(geo.sphere, mat(0xffee99,{emissive:0xffcc55,emissiveIntensity:1})); bulb.position.y=5.1; bulb.scale.set(0.9,0.9,0.9);
-  const light = new THREE.PointLight(0xffcc66, 0.6, 14);
-  light.position.y = 5.1;
-  grp.add(pole); grp.add(bulb); grp.add(light);
+  grp.add(pole); grp.add(bulb);
   grp.position.set(side*11, 0, 0);
   return grp;
 }
@@ -434,14 +425,12 @@ function pickWeighted(decoSet){
 
 function populateDecos(g, decoSet){
   clearDecos(g);
-  // more objects per segment = denser scenery (was 3 rows, now 5)
-  for(let i=0;i<5;i++){
+  for(let i=0;i<3;i++){
     for(const side of [-1,1]){
       if(Math.random()<0.8){
         const builder = pickWeighted(decoSet);
         const d = builder(side);
         d.position.z += -Math.random()*SEG_LEN;
-        d.traverse(o=>{ if(o.isMesh){ o.castShadow = true; o.receiveShadow = true; } });
         g.add(d);
         g.userData.decos.push(d);
       }
@@ -454,7 +443,7 @@ let weatherPoints = null;
 function setWeather(kind){
   if(weatherPoints){ scene.remove(weatherPoints); weatherPoints.geometry.dispose(); weatherPoints=null; }
   if(kind==="none") return;
-  const count = 400;
+  const count = 220;
   const positions = new Float32Array(count*3);
   for(let i=0;i<count;i++){
     positions[i*3] = (Math.random()-0.5)*60;
@@ -661,7 +650,7 @@ function buildCarMesh(colorHex, bodyType, isPlayer){
   blob.position.y = 0.015;
   grp.add(blob);
 
-  grp.traverse(o=>{ if(o.isMesh && o!==blob){ o.castShadow = true; o.receiveShadow = true; } });
+  grp.traverse(o=>{ if(o.isMesh && o!==blob){ o.castShadow = false; o.receiveShadow = false; } });
 
   grp.userData.halfLen = bl/2;
   grp.userData.wheels = wheels;
